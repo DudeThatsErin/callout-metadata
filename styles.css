@@ -101,6 +101,32 @@ Plugin controlled CSS
     padding-bottom: 8px;
 }
 
+/* Apply metadata colors to callouts */
+.callout[data-callout-metadata] {
+    --callout-color: var(--callout-color);
+}
+
+
+/* Force Obsidian callout color to use metadata color */
+.callout[data-color] {
+    --callout-color: inherit;
+}
+
+
+.callout[data-color] {
+    border-color: rgb(var(--callout-color));
+}
+
+
+.callout[data-color] .callout-title {
+    background-color: rgba(var(--callout-color), 0.15);
+}
+
+
+.callout[data-color] .callout-icon {
+    color: rgb(var(--callout-color));
+}
+
 
 /* =========================================================
    Alignment
