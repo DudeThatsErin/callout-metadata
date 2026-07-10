@@ -3,6 +3,104 @@ Callout Metadata
 Plugin controlled CSS
 */
 
+/* Support Links */
+.support-container {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 8px 0 12px 0;
+}
+
+
+.support-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 8px 14px;
+
+    border-radius: 6px;
+
+    text-decoration: none;
+    font-size: var(--font-ui-small);
+    font-weight: 500;
+
+    line-height: 1;
+
+    border: 1px solid transparent;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+        background-color 0.15s ease,
+        transform 0.15s ease,
+        opacity 0.15s ease;
+}
+
+
+.support-link:hover {
+    text-decoration: none;
+    transform: translateY(-1px);
+    opacity: 0.9;
+}
+
+
+/* Buy Me a Coffee */
+.coffee-link {
+    background: #FFDD00 !important;
+    color: #000 !important;
+}
+
+.coffee-link:hover {
+    background: #e6c800 !important;
+}
+
+
+/* GitHub */
+.github-link {
+    background: #24292e !important;
+    color: #fff !important;
+}
+
+.github-link:hover {
+    background: #3a4149 !important;
+}
+
+
+/* Issues */
+.issues-link {
+    background: #d73a49 !important;
+    color: #fff !important;
+}
+
+.issues-link:hover {
+    background: #b02a37 !important;
+}
+
+
+/* Discord */
+.discord-link {
+    background: #5865F2 !important;
+    color: #fff !important;
+}
+
+.discord-link:hover {
+    background: #4752c4 !important;
+}
+
+
+/*
+ * Remove Obsidian setting row borders/padding
+ * around the support link section
+ */
+.setting-item:has(.support-link) {
+    border: none;
+    padding-top: 4px;
+    padding-bottom: 8px;
+}
+
 
 /* =========================================================
    Alignment
@@ -28,61 +126,37 @@ Plugin controlled CSS
     margin-right:0;
 }
 
-
-
 /* Live preview */
-
 .cm-embed-block[data-align="left"] {
     margin-left:0;
     margin-right:auto;
 }
-
 
 .cm-embed-block[data-align="center"] {
     margin-left:auto;
     margin-right:auto;
 }
 
-
 .cm-embed-block[data-align="right"] {
     margin-left:auto;
     margin-right:0;
 }
 
-
-
-
-
 /* =========================================================
    Width
 ========================================================= */
-
 .callout[data-width] {
     max-width:100%;
 }
 
-
-
-
-
 /* =========================================================
    Shadow
 ========================================================= */
-
-
 .callout[data-shadow] {
-
     box-shadow:
         var(--cm-shadow-strength)
         var(--cm-shadow-color);
-
 }
-
-
-
-
-
-
 
 /* =========================================================
    Rounded

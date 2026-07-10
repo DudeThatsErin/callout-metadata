@@ -7,16 +7,13 @@ import {
 import type CalloutMetadataPlugin from "./main";
 
 import {
-    SUPPORT_LINKS,
-    PLUGIN_INFO
+    SUPPORT_LINKS
 } from "./constants";
-
 
 
 export class CalloutMetadataSettingTab extends PluginSettingTab {
 
     plugin: CalloutMetadataPlugin;
-
 
 
     constructor(
@@ -31,18 +28,11 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
     }
 
 
-
-
-
     display(): void {
 
-        const {
-            containerEl
-        } = this;
-
+        const { containerEl } = this;
 
         containerEl.empty();
-
 
 
         containerEl.createEl(
@@ -53,11 +43,94 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
         );
 
 
+        this.renderSupport(containerEl);
 
-        this.addSupportLinks(containerEl);
+        this.renderAppearance(containerEl);
+
+    }
 
 
-        containerEl.createEl(
+
+
+    private async updateSettings(
+        callback: () => void
+    ) {
+
+        callback();
+
+        await this.plugin.saveSettings();
+
+        this.plugin.applyCSSVariables();
+
+    }
+
+
+
+
+
+
+    private renderSupport(
+        container: HTMLElement
+    ) {
+
+        new Setting(container)
+            .setName("Support & Links")
+            .setDesc(
+                "Support development, report bugs, or get help."
+            );
+
+
+        const wrapper =
+            container.createDiv(
+                {
+                    cls: "support-container"
+                }
+            );
+
+
+        SUPPORT_LINKS.forEach(
+            link => {
+
+                const anchor =
+                    wrapper.createEl(
+                        "a",
+                        {
+                            text: link.text,
+                            href: link.href
+                        }
+                    );
+
+
+                anchor.classList.add(
+                    "support-link",
+                    link.cls
+                );
+
+
+                anchor.target =
+                    "_blank";
+
+
+                anchor.rel =
+                    "noopener noreferrer";
+
+            }
+        );
+
+    }
+
+
+
+
+
+
+
+
+    private renderAppearance(
+        container: HTMLElement
+    ) {
+
+        container.createEl(
             "h3",
             {
                 text: "Appearance"
@@ -65,159 +138,10 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
         );
 
 
-        this.addAppearanceSettings(
-            containerEl
-        );
 
+        new Setting(container)
 
-
-        containerEl.createEl(
-            "h3",
-            {
-                text: "Effects"
-            }
-        );
-
-
-        this.addEffectSettings(
-            containerEl
-        );
-
-
-
-        containerEl.createEl(
-            "h3",
-            {
-                text: "Tokens"
-            }
-        );
-
-
-        this.addTokenHelp(
-            containerEl
-        );
-
-
-
-        containerEl.createEl(
-            "h3",
-            {
-                text: "About"
-            }
-        );
-
-
-        containerEl.createEl(
-            "p",
-            {
-                text:
-                    `${PLUGIN_INFO.name} v${PLUGIN_INFO.version} by ${PLUGIN_INFO.author}`
-            }
-        );
-
-    }
-
-
-
-
-
-
-
-
-    private addSupportLinks(
-        containerEl: HTMLElement
-    ) {
-
-
-        new Setting(containerEl)
-            .setName("Support & Links")
-            .setDesc(
-                "Support development, report bugs, or get help."
-            )
-            .addButton(() => {});
-
-
-
-        const wrapper =
-            containerEl.createDiv(
-                {
-                    cls:
-                        "cm-support-links"
-                }
-            );
-
-
-        wrapper.style.cssText =
-            `
-            display:flex;
-            flex-wrap:wrap;
-            gap:8px;
-            margin:0 0 20px 0;
-            `;
-
-
-
-        SUPPORT_LINKS.forEach(
-            link => {
-
-                const button =
-                    wrapper.createEl(
-                        "a",
-                        {
-                            text:
-                                link.text,
-                            href:
-                                link.href
-                        }
-                    );
-
-
-                button.className =
-                    `cm-support-button ${link.cls}`;
-
-
-                button.target =
-                    "_blank";
-
-
-                button.rel =
-                    "noopener noreferrer";
-
-
-                button.style.cssText =
-                    `
-                    padding:6px 12px;
-                    border-radius:6px;
-                    text-decoration:none;
-                    border:1px solid var(--background-modifier-border);
-                    background:var(--background-secondary);
-                    cursor:pointer;
-                    `;
-
-            }
-        );
-
-    }
-
-
-
-
-
-
-
-
-
-    private addAppearanceSettings(
-        containerEl: HTMLElement
-    ) {
-
-
-
-        new Setting(containerEl)
-
-            .setName(
-                "Border Radius"
-            )
+            .setName("Border Radius")
 
             .setDesc(
                 "Corner radius for rounded callouts"
@@ -227,6 +151,7 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
                 slider => {
 
                     slider
+
                         .setLimits(
                             0,
                             32,
@@ -242,14 +167,12 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
                         .onChange(
                             async value => {
 
-                                this.plugin.settings.roundedRadius =
-                                    value;
-
-
-                                await this.plugin.saveSettings();
-
-
-                                this.plugin.applyCSSVariables();
+                                await this.updateSettings(
+                                    () => {
+                                        this.plugin.settings.roundedRadius =
+                                            value;
+                                    }
+                                );
 
                             }
                         );
@@ -261,11 +184,12 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
 
 
 
-        new Setting(containerEl)
 
-            .setName(
-                "Shadow Strength"
-            )
+
+
+        new Setting(container)
+
+            .setName("Shadow Strength")
 
             .setDesc(
                 "CSS shadow offset and blur values"
@@ -275,6 +199,7 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
                 text => {
 
                     text
+
                         .setValue(
                             this.plugin.settings.shadowStrength
                         )
@@ -282,14 +207,12 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
                         .onChange(
                             async value => {
 
-                                this.plugin.settings.shadowStrength =
-                                    value;
-
-
-                                await this.plugin.saveSettings();
-
-
-                                this.plugin.applyCSSVariables();
+                                await this.updateSettings(
+                                    () => {
+                                        this.plugin.settings.shadowStrength =
+                                            value;
+                                    }
+                                );
 
                             }
                         );
@@ -303,16 +226,20 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
 
 
 
-        new Setting(containerEl)
 
-            .setName(
-                "Shadow Color (Light)"
+        new Setting(container)
+
+            .setName("Shadow Color (Light)")
+
+            .setDesc(
+                "Shadow color in light mode"
             )
 
             .addColorPicker(
                 picker => {
 
                     picker
+
                         .setValue(
                             this.plugin.settings.shadowColorLight
                         )
@@ -320,14 +247,12 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
                         .onChange(
                             async value => {
 
-                                this.plugin.settings.shadowColorLight =
-                                    value;
-
-
-                                await this.plugin.saveSettings();
-
-
-                                this.plugin.applyCSSVariables();
+                                await this.updateSettings(
+                                    () => {
+                                        this.plugin.settings.shadowColorLight =
+                                            value;
+                                    }
+                                );
 
                             }
                         );
@@ -342,16 +267,19 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
 
 
 
-        new Setting(containerEl)
+        new Setting(container)
 
-            .setName(
-                "Shadow Color (Dark)"
+            .setName("Shadow Color (Dark)")
+
+            .setDesc(
+                "Shadow color in dark mode"
             )
 
             .addColorPicker(
                 picker => {
 
                     picker
+
                         .setValue(
                             this.plugin.settings.shadowColorDark
                         )
@@ -359,14 +287,12 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
                         .onChange(
                             async value => {
 
-                                this.plugin.settings.shadowColorDark =
-                                    value;
-
-
-                                await this.plugin.saveSettings();
-
-
-                                this.plugin.applyCSSVariables();
+                                await this.updateSettings(
+                                    () => {
+                                        this.plugin.settings.shadowColorDark =
+                                            value;
+                                    }
+                                );
 
                             }
                         );
@@ -381,16 +307,19 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
 
 
 
-        new Setting(containerEl)
+        new Setting(container)
 
-            .setName(
-                "Outline Width"
+            .setName("Outline Width")
+
+            .setDesc(
+                "Border width for outline callouts"
             )
 
             .addSlider(
                 slider => {
 
                     slider
+
                         .setLimits(
                             1,
                             6,
@@ -406,14 +335,12 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
                         .onChange(
                             async value => {
 
-                                this.plugin.settings.outlineWidth =
-                                    value;
-
-
-                                await this.plugin.saveSettings();
-
-
-                                this.plugin.applyCSSVariables();
+                                await this.updateSettings(
+                                    () => {
+                                        this.plugin.settings.outlineWidth =
+                                            value;
+                                    }
+                                );
 
                             }
                         );
@@ -428,11 +355,12 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
 
 
 
+        new Setting(container)
 
-        new Setting(containerEl)
+            .setName("Outline Style")
 
-            .setName(
-                "Outline Style"
+            .setDesc(
+                "Border style"
             )
 
             .addDropdown(
@@ -462,168 +390,21 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
                         .onChange(
                             async value => {
 
-                                this.plugin.settings.outlineStyle =
-                                    value as
-                                    "solid" |
-                                    "dashed" |
-                                    "dotted";
-
-
-                                await this.plugin.saveSettings();
-
-
-                                this.plugin.applyCSSVariables();
+                                await this.updateSettings(
+                                    () => {
+                                        this.plugin.settings.outlineStyle =
+                                            value as
+                                            "solid" |
+                                            "dashed" |
+                                            "dotted";
+                                    }
+                                );
 
                             }
                         );
 
                 }
             );
-
-    }
-
-
-
-
-
-
-
-
-
-    private addEffectSettings(
-        containerEl: HTMLElement
-    ) {
-
-
-        const settings = [
-            [
-                "enableGlass",
-                "Glass effect",
-                "Enable translucent glass callouts"
-            ],
-            [
-                "enableGradient",
-                "Gradient effect",
-                "Enable gradient backgrounds"
-            ],
-            [
-                "enableCompact",
-                "Compact callouts",
-                "Reduce callout padding"
-            ],
-            [
-                "enableHover",
-                "Hover effect",
-                "Add hover animation"
-            ],
-            [
-                "enableSticky",
-                "Sticky callouts",
-                "Enable sticky positioning"
-            ]
-
-        ] as const;
-
-
-
-        settings.forEach(
-            ([key,name,desc]) => {
-
-
-                new Setting(containerEl)
-
-                    .setName(name)
-
-                    .setDesc(desc)
-
-                    .addToggle(
-                        toggle => {
-
-                            toggle
-                                .setValue(
-                                    this.plugin.settings[key]
-                                )
-
-                                .onChange(
-                                    async value => {
-
-                                        this.plugin.settings[key] =
-                                            value;
-
-
-                                        await this.plugin.saveSettings();
-
-
-                                        this.plugin.applyCSSVariables();
-
-                                    }
-                                );
-
-                        }
-                    );
-
-            }
-        );
-
-
-    }
-
-
-
-
-
-
-
-
-
-    private addTokenHelp(
-        containerEl: HTMLElement
-    ) {
-
-
-        containerEl.createEl(
-            "pre",
-            {
-                text:
-                    "> [!note|50|orange|center|shadow|rounded|outline]"
-            }
-        );
-
-
-
-        const list =
-            containerEl.createEl(
-                "ul"
-            );
-
-
-        [
-            "Number (0-100) → width percentage",
-            "left / center / right → alignment",
-            "shadow → drop shadow",
-            "rounded → rounded corners",
-            "outline → border outline",
-            "glass → glass effect",
-            "gradient → gradient effect",
-            "compact → smaller padding",
-            "hover → hover animation",
-            "sticky → sticky positioning",
-            "css=name → custom CSS class",
-            "Anything else → color"
-        ]
-
-        .forEach(
-            item => {
-
-                list.createEl(
-                    "li",
-                    {
-                        text:item
-                    }
-                );
-
-            }
-        );
 
     }
 
