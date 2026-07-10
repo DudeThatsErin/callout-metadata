@@ -1,0 +1,9 @@
+{
+    "id": "callout-metadata",
+    "name": "Callout Metadata",
+    "version": "1.0.0",
+    "author": "Erin Skidds",
+    "minAppVersion": "1.5.0",
+    "description": "Add & Read metadata tokens on callouts. Works with your existing callouts, no need to change your syntax.",
+    "isDesktopOnly": false
+}

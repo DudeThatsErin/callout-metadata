@@ -1,0 +1,43 @@
+:root {
+  --cm-rounded-radius: 12px;
+
+  --cm-shadow-strength: 0 2px 8px;
+  --cm-shadow-color: #00000026;
+
+  --cm-outline-width: 2px;
+  --cm-outline-color: #888888;
+}
+
+
+.theme-dark {
+  --cm-shadow-color: #00000040;
+  --cm-outline-color: #aaaaaa;
+}
+
+
+.callout[data-shadow] {
+  box-shadow: var(--cm-shadow-strength) var(--cm-shadow-color);
+}
+
+
+.callout[data-rounded] {
+  border-radius: var(--cm-rounded-radius);
+  overflow: hidden;
+}
+
+
+.callout[data-outline] {
+  border-width: var(--cm-outline-width);
+  border-style: solid;
+  border-color: var(--cm-outline-color);
+}
+
+
+body.cm-outline-dashed .callout[data-outline] {
+  border-style: dashed;
+}
+
+
+body.cm-outline-dotted .callout[data-outline] {
+  border-style: dotted;
+}
