@@ -1,43 +1,213 @@
-:root {
-  --cm-rounded-radius: 12px;
+/*
+Callout Metadata
+Plugin controlled CSS
+*/
 
-  --cm-shadow-strength: 0 2px 8px;
-  --cm-shadow-color: #00000026;
 
-  --cm-outline-width: 2px;
-  --cm-outline-color: #888888;
+/* =========================================================
+   Alignment
+========================================================= */
+
+
+/* Reading view */
+
+.callout[data-align="left"] {
+    margin-left:0;
+    margin-right:auto;
 }
 
 
-.theme-dark {
-  --cm-shadow-color: #00000040;
-  --cm-outline-color: #aaaaaa;
+.callout[data-align="center"] {
+    margin-left:auto;
+    margin-right:auto;
 }
+
+
+.callout[data-align="right"] {
+    margin-left:auto;
+    margin-right:0;
+}
+
+
+
+/* Live preview */
+
+.cm-embed-block[data-align="left"] {
+    margin-left:0;
+    margin-right:auto;
+}
+
+
+.cm-embed-block[data-align="center"] {
+    margin-left:auto;
+    margin-right:auto;
+}
+
+
+.cm-embed-block[data-align="right"] {
+    margin-left:auto;
+    margin-right:0;
+}
+
+
+
+
+
+/* =========================================================
+   Width
+========================================================= */
+
+.callout[data-width] {
+    max-width:100%;
+}
+
+
+
+
+
+/* =========================================================
+   Shadow
+========================================================= */
 
 
 .callout[data-shadow] {
-  box-shadow: var(--cm-shadow-strength) var(--cm-shadow-color);
+
+    box-shadow:
+        var(--cm-shadow-strength)
+        var(--cm-shadow-color);
+
 }
 
 
+
+
+
+
+
+/* =========================================================
+   Rounded
+========================================================= */
 .callout[data-rounded] {
-  border-radius: var(--cm-rounded-radius);
-  overflow: hidden;
+    border-radius:
+        var(--cm-rounded-radius);
+    overflow:hidden;
 }
 
-
+/* =========================================================
+   Outline
+========================================================= */
 .callout[data-outline] {
-  border-width: var(--cm-outline-width);
-  border-style: solid;
-  border-color: var(--cm-outline-color);
+    border:
+        var(--cm-outline-width)
+        solid
+        var(--cm-outline-color);
+}
+
+body.cm-outline-dashed
+.callout[data-outline] {
+    border-style:dashed;
+}
+
+body.cm-outline-dotted
+.callout[data-outline] {
+    border-style:dotted;
 }
 
 
-body.cm-outline-dashed .callout[data-outline] {
-  border-style: dashed;
+/* =========================================================
+   Glass
+========================================================= */
+.callout[data-glass] {
+    background:
+        color-mix(
+            in srgb,
+            var(--callout-color)
+            25%,
+            transparent
+        );
+    backdrop-filter:
+        blur(12px);
+    -webkit-backdrop-filter:
+        blur(12px);
+}
+
+/* =========================================================
+   Gradient
+========================================================= */
+.callout[data-gradient] {
+    background:
+        linear-gradient(
+            135deg,
+            color-mix(
+                in srgb,
+                var(--callout-color)
+                35%,
+                transparent
+            ),
+            transparent
+        );
+}
+
+/* =========================================================
+   Borderless
+========================================================= */
+.callout[data-borderless] {
+    border:none;
 }
 
 
-body.cm-outline-dotted .callout[data-outline] {
-  border-style: dotted;
+/* =========================================================
+   Compact
+========================================================= */
+.callout[data-compact]
+.callout-content {
+    padding:
+        0.5rem;
+}
+
+
+.callout[data-compact]
+.callout-title {
+    padding:
+        0.35rem
+        0.5rem;
+}
+
+
+/* =========================================================
+   Hover
+========================================================= */
+.callout[data-hover] {
+    transition:
+        transform .2s ease,
+        box-shadow .2s ease;
+}
+
+.callout[data-hover]:hover {
+    transform:
+        translateY(-2px);
+
+    box-shadow:
+        0 8px 20px
+        rgba(0,0,0,.15);
+}
+
+
+/* =========================================================
+   Sticky
+========================================================= */
+.callout[data-sticky] {
+    position:sticky;
+    top:
+        var(--header-height);
+
+}
+
+/* =========================================================
+   Custom CSS classes
+========================================================= */
+.callout[data-css] {
+
+    /* marker only */
+
 }

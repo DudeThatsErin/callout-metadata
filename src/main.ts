@@ -4,7 +4,9 @@ import {
     debounce
 } from "obsidian";
 
-import { processCallouts } from "./processor";
+import {
+    processCallouts
+} from "./processor";
 
 import {
     CalloutMetadataSettingTab
@@ -18,44 +20,79 @@ import {
 
 
 export default class CalloutMetadataPlugin extends Plugin {
-    settings: CalloutMetadataSettings = DEFAULT_SETTINGS;
+
+    settings: CalloutMetadataSettings = {
+        ...DEFAULT_SETTINGS
+    };
+
+
 
     async onload() {
+
         await this.loadSettings();
+
         this.applyCSSVariables();
+        this.applyEffectClasses();
 
-        this.registerMarkdownPostProcessor((el) => {
-            processCallouts(el);
-        });
 
-        this.app.workspace.onLayoutReady(() => {
-            this.processAllViews();
-            this.applyCSSVariables();
-            this.app.workspace.trigger("css-change");
-        });
+
+        this.registerMarkdownPostProcessor(
+            (el) => {
+
+                processCallouts(el);
+
+            }
+        );
+
+
+
+        this.app.workspace.onLayoutReady(
+            () => {
+
+                this.processAllViews();
+
+                this.applyCSSVariables();
+                this.applyEffectClasses();
+
+                this.app.workspace.trigger(
+                    "css-change"
+                );
+
+            }
+        );
+
+
 
         this.registerEvent(
+
             this.app.workspace.on(
                 "layout-change",
                 () => {
+
                     this.debouncedProcess();
+
                 }
             )
 
         );
 
-        /*
-         * Update CSS variables when theme changes
-         */
+
+
         this.registerEvent(
 
             this.app.workspace.on(
                 "css-change",
                 () => {
+
                     this.applyCSSVariables();
+                    this.applyEffectClasses();
+
                 }
             )
+
         );
+
+
 
         this.addSettingTab(
             new CalloutMetadataSettingTab(
@@ -66,17 +103,27 @@ export default class CalloutMetadataPlugin extends Plugin {
 
     }
 
-    /*
-     * Inject plugin settings into CSS variables
+
+
+
+
+
+
+    /**
+     * Apply CSS variables from settings
      */
     applyCSSVariables() {
+
         const root =
             document.documentElement;
+
 
         const dark =
             document.body.classList.contains(
                 "theme-dark"
             );
+
+
 
         root.style.setProperty(
             "--cm-rounded-radius",
@@ -102,49 +149,30 @@ export default class CalloutMetadataPlugin extends Plugin {
 
 
         root.style.setProperty(
-
             "--cm-outline-width",
-
             `${this.settings.outlineWidth}px`
-
         );
 
 
 
         root.style.setProperty(
-
             "--cm-outline-color",
-
             dark
-
                 ? this.settings.outlineColorDark
-
                 : this.settings.outlineColorLight
-
         );
 
 
-
-        /*
-         * Outline style class
-         */
 
         document.body.classList.remove(
-
             "cm-outline-solid",
-
             "cm-outline-dashed",
-
             "cm-outline-dotted"
-
         );
-
 
 
         document.body.classList.add(
-
             `cm-outline-${this.settings.outlineStyle}`
-
         );
 
     }
@@ -155,15 +183,69 @@ export default class CalloutMetadataPlugin extends Plugin {
 
 
 
-    private debouncedProcess = debounce(
 
-        () => this.processAllViews(),
+    /**
+     * Enable/disable optional effects
+     * through body classes.
+     */
+    applyEffectClasses() {
 
-        200,
+        const body =
+            document.body;
 
-        true
 
-    );
+
+        const effects = {
+
+            glass:
+                this.settings.enableGlass,
+
+            gradient:
+                this.settings.enableGradient,
+
+            compact:
+                this.settings.enableCompact,
+
+            hover:
+                this.settings.enableHover,
+
+            sticky:
+                this.settings.enableSticky
+
+        };
+
+
+
+        Object.entries(effects)
+            .forEach(
+                ([name, enabled]) => {
+
+                    body.toggleClass(
+                        `cm-${name}-disabled`,
+                        !enabled
+                    );
+
+                }
+            );
+
+    }
+
+
+
+
+
+
+
+
+
+    private debouncedProcess =
+        debounce(
+            () => this.processAllViews(),
+            200,
+            true
+        );
+
+
 
 
 
@@ -172,29 +254,25 @@ export default class CalloutMetadataPlugin extends Plugin {
 
     private processAllViews() {
 
-
         this.app.workspace.iterateAllLeaves(
-
             (leaf) => {
-
 
                 if (
                     leaf.view instanceof MarkdownView
                 ) {
 
-
                     processCallouts(
                         leaf.view.containerEl
                     );
 
-
                 }
 
             }
-
         );
 
     }
+
+
 
 
 
@@ -204,18 +282,15 @@ export default class CalloutMetadataPlugin extends Plugin {
 
     async loadSettings() {
 
-
-        this.settings = Object.assign(
-
-            {},
-
-            DEFAULT_SETTINGS,
-
-            await this.loadData()
-
-        );
+        this.settings =
+            Object.assign(
+                {},
+                DEFAULT_SETTINGS,
+                await this.loadData()
+            );
 
     }
+
 
 
 
@@ -225,13 +300,19 @@ export default class CalloutMetadataPlugin extends Plugin {
 
     async saveSettings() {
 
-
         await this.saveData(
             this.settings
         );
 
 
-    }
+        this.applyCSSVariables();
 
+        this.applyEffectClasses();
+
+        this.app.workspace.trigger(
+            "css-change"
+        );
+
+    }
 
 }

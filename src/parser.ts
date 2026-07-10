@@ -1,48 +1,141 @@
 import { CalloutMetadata } from "./types";
 
-export function parseMetadata(raw: string): CalloutMetadata {
+
+const STYLE_TOKENS: Array<
+    keyof Pick<
+        CalloutMetadata,
+        | "shadow"
+        | "rounded"
+        | "outline"
+        | "glass"
+        | "gradient"
+        | "borderless"
+        | "compact"
+        | "hover"
+        | "sticky"
+    >
+> = [
+    "shadow",
+    "rounded",
+    "outline",
+    "glass",
+    "gradient",
+    "borderless",
+    "compact",
+    "hover",
+    "sticky",
+];
+
+
+export function parseMetadata(
+    raw: string
+): CalloutMetadata {
+
     const result: CalloutMetadata = {};
-    const tokens = raw.split("|").map((t) => t.trim()).filter(Boolean);
+
+    const tokens =
+        raw
+            .split("|")
+            .map(t => t.trim())
+            .filter(Boolean);
+
+
 
     for (const token of tokens) {
+
+
         if (token.includes("=")) {
-            const eq = token.indexOf("=");
-            const key = token.substring(0, eq).toLowerCase();
-            const value = token.substring(eq + 1);
+
+            const eq =
+                token.indexOf("=");
+
+
+            const key =
+                token
+                    .substring(0, eq)
+                    .toLowerCase();
+
+
+            const value =
+                token.substring(eq + 1);
+
+
 
             if (key === "css") {
-                const classes = value.split(/[,\s]+/).filter(Boolean);
-                result.css = result.css
-                    ? result.css + " " + classes.join(" ")
-                    : classes.join(" ");
+
+                result.css =
+                    result.css
+                        ? `${result.css} ${value}`
+                        : value;
+
             }
+
+
             continue;
+
         }
+
+
+
 
         if (/^\d+$/.test(token)) {
-            result.width = Number(token);
+
+            result.width =
+                Number(token);
+
             continue;
+
         }
 
-        switch (token.toLowerCase()) {
-            case "left":
-            case "right":
-            case "center":
-                result.align = token.toLowerCase() as CalloutMetadata["align"];
-                continue;
-            case "shadow":
-                result.shadow = true;
-                continue;
-            case "rounded":
-                result.rounded = true;
-                continue;
-            case "outline":
-                result.outline = true;
-                continue;
+
+
+
+        const lower =
+            token.toLowerCase();
+
+
+
+        if (
+            lower === "left" ||
+            lower === "right" ||
+            lower === "center"
+        ) {
+
+            result.align =
+                lower;
+
+            continue;
+
         }
 
-        result.color = token;
+
+
+        if (
+            STYLE_TOKENS.includes(
+                lower as typeof STYLE_TOKENS[number]
+            )
+        ) {
+
+            result[
+                lower as typeof STYLE_TOKENS[number]
+            ] = true;
+
+
+            continue;
+
+        }
+
+
+
+        /*
+         * Anything else is a color
+         */
+        result.color =
+            token;
+
     }
 
+
     return result;
+
 }

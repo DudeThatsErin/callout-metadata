@@ -25,6 +25,17 @@ module.exports = __toCommonJS(main_exports);
 var import_obsidian2 = require("obsidian");
 
 // src/parser.ts
+var STYLE_TOKENS = [
+  "shadow",
+  "rounded",
+  "outline",
+  "glass",
+  "gradient",
+  "borderless",
+  "compact",
+  "hover",
+  "sticky"
+];
 function parseMetadata(raw) {
   const result = {};
   const tokens = raw.split("|").map((t) => t.trim()).filter(Boolean);
@@ -34,8 +45,7 @@ function parseMetadata(raw) {
       const key = token.substring(0, eq).toLowerCase();
       const value = token.substring(eq + 1);
       if (key === "css") {
-        const classes = value.split(/[,\s]+/).filter(Boolean);
-        result.css = result.css ? result.css + " " + classes.join(" ") : classes.join(" ");
+        result.css = result.css ? `${result.css} ${value}` : value;
       }
       continue;
     }
@@ -43,21 +53,16 @@ function parseMetadata(raw) {
       result.width = Number(token);
       continue;
     }
-    switch (token.toLowerCase()) {
-      case "left":
-      case "right":
-      case "center":
-        result.align = token.toLowerCase();
-        continue;
-      case "shadow":
-        result.shadow = true;
-        continue;
-      case "rounded":
-        result.rounded = true;
-        continue;
-      case "outline":
-        result.outline = true;
-        continue;
+    const lower = token.toLowerCase();
+    if (lower === "left" || lower === "right" || lower === "center") {
+      result.align = lower;
+      continue;
+    }
+    if (STYLE_TOKENS.includes(
+      lower
+    )) {
+      result[lower] = true;
+      continue;
     }
     result.color = token;
   }
@@ -123,11 +128,16 @@ function processCallouts(container) {
     const raw = el.getAttribute("data-callout-metadata");
     if (!raw)
       return;
-    applyMetadata(el, parseMetadata(raw));
+    applyMetadata(
+      el,
+      parseMetadata(raw)
+    );
   });
 }
 function applyMetadata(el, meta) {
-  const wrapper = el.closest(".cm-embed-block");
+  const wrapper = el.closest(
+    ".cm-embed-block"
+  );
   if (meta.width != null) {
     el.dataset.width = String(meta.width);
     if (wrapper) {
@@ -140,7 +150,10 @@ function applyMetadata(el, meta) {
   if (meta.color) {
     const rgb = resolveColor(meta.color);
     if (rgb) {
-      el.style.setProperty("--callout-color", rgb);
+      el.style.setProperty(
+        "--callout-color",
+        rgb
+      );
     }
     el.dataset.color = meta.color;
   }
@@ -151,18 +164,35 @@ function applyMetadata(el, meta) {
     }
   }
   if (meta.shadow) {
-    el.setAttribute("data-shadow", "");
+    el.dataset.shadow = "";
   }
   if (meta.rounded) {
-    el.setAttribute("data-rounded", "");
+    el.dataset.rounded = "";
   }
   if (meta.outline) {
-    el.setAttribute("data-outline", "");
+    el.dataset.outline = "";
+  }
+  if (meta.glass) {
+    el.dataset.glass = "";
+  }
+  if (meta.gradient) {
+    el.dataset.gradient = "";
+  }
+  if (meta.borderless) {
+    el.dataset.borderless = "";
+  }
+  if (meta.compact) {
+    el.dataset.compact = "";
+  }
+  if (meta.hover) {
+    el.dataset.hover = "";
+  }
+  if (meta.sticky) {
+    el.dataset.sticky = "";
   }
   if (meta.css) {
-    meta.css.split(/\s+/).forEach((cls) => {
-      if (cls)
-        el.classList.add(cls);
+    meta.css.split(/\s+/).filter(Boolean).forEach((cls) => {
+      el.classList.add(cls);
     });
     el.dataset.css = meta.css;
   }
@@ -207,116 +237,288 @@ var CalloutMetadataSettingTab = class extends import_obsidian.PluginSettingTab {
     this.plugin = plugin;
   }
   display() {
-    const { containerEl } = this;
+    const {
+      containerEl
+    } = this;
     containerEl.empty();
-    containerEl.createEl("h2", {
-      text: "Callout Metadata"
-    });
+    containerEl.createEl(
+      "h2",
+      {
+        text: "Callout Metadata"
+      }
+    );
     this.addSupportLinks(containerEl);
-    containerEl.createEl("h3", {
-      text: "Appearance"
+    containerEl.createEl(
+      "h3",
+      {
+        text: "Appearance"
+      }
+    );
+    this.addAppearanceSettings(
+      containerEl
+    );
+    containerEl.createEl(
+      "h3",
+      {
+        text: "Effects"
+      }
+    );
+    this.addEffectSettings(
+      containerEl
+    );
+    containerEl.createEl(
+      "h3",
+      {
+        text: "Tokens"
+      }
+    );
+    this.addTokenHelp(
+      containerEl
+    );
+    containerEl.createEl(
+      "h3",
+      {
+        text: "About"
+      }
+    );
+    containerEl.createEl(
+      "p",
+      {
+        text: `${PLUGIN_INFO.name} v${PLUGIN_INFO.version} by ${PLUGIN_INFO.author}`
+      }
+    );
+  }
+  addSupportLinks(containerEl) {
+    new import_obsidian.Setting(containerEl).setName("Support & Links").setDesc(
+      "Support development, report bugs, or get help."
+    ).addButton(() => {
     });
-    new import_obsidian.Setting(containerEl).setName("Border Radius").setDesc("Corner radius for rounded callouts").addSlider((slider) => {
-      slider.setLimits(0, 32, 1).setValue(this.plugin.settings.roundedRadius).setDynamicTooltip().onChange(async (value) => {
-        this.plugin.settings.roundedRadius = value;
-        await this.plugin.saveSettings();
-        this.plugin.applyCSSVariables();
-      });
-    });
-    new import_obsidian.Setting(containerEl).setName("Shadow Strength").setDesc("CSS shadow offset and blur").addText((text) => {
-      text.setValue(this.plugin.settings.shadowStrength).onChange(async (value) => {
-        this.plugin.settings.shadowStrength = value;
-        await this.plugin.saveSettings();
-        this.plugin.applyCSSVariables();
-      });
-    });
-    new import_obsidian.Setting(containerEl).setName("Shadow Color (Light)").setDesc("Shadow color in light mode").addColorPicker((color) => {
-      color.setValue(this.plugin.settings.shadowColorLight).onChange(async (value) => {
-        this.plugin.settings.shadowColorLight = value;
-        await this.plugin.saveSettings();
-        this.plugin.applyCSSVariables();
-      });
-    });
-    new import_obsidian.Setting(containerEl).setName("Shadow Color (Dark)").setDesc("Shadow color in dark mode").addColorPicker((color) => {
-      color.setValue(this.plugin.settings.shadowColorDark).onChange(async (value) => {
-        this.plugin.settings.shadowColorDark = value;
-        await this.plugin.saveSettings();
-        this.plugin.applyCSSVariables();
-      });
-    });
-    new import_obsidian.Setting(containerEl).setName("Outline Width").setDesc("Border width for outline callouts").addSlider((slider) => {
-      slider.setLimits(1, 6, 1).setValue(this.plugin.settings.outlineWidth).setDynamicTooltip().onChange(async (value) => {
-        this.plugin.settings.outlineWidth = value;
-        await this.plugin.saveSettings();
-        this.plugin.applyCSSVariables();
-      });
-    });
-    new import_obsidian.Setting(containerEl).setName("Outline Color (Light)").setDesc("Outline color in light mode").addColorPicker((color) => {
-      color.setValue(this.plugin.settings.outlineColorLight).onChange(async (value) => {
-        this.plugin.settings.outlineColorLight = value;
-        await this.plugin.saveSettings();
-        this.plugin.applyCSSVariables();
-      });
-    });
-    new import_obsidian.Setting(containerEl).setName("Outline Color (Dark)").setDesc("Outline color in dark mode").addColorPicker((color) => {
-      color.setValue(this.plugin.settings.outlineColorDark).onChange(async (value) => {
-        this.plugin.settings.outlineColorDark = value;
-        await this.plugin.saveSettings();
-        this.plugin.applyCSSVariables();
-      });
-    });
-    new import_obsidian.Setting(containerEl).setName("Outline Style").setDesc("Border style for outline callouts").addDropdown((dropdown) => {
-      dropdown.addOption("solid", "Solid").addOption("dashed", "Dashed").addOption("dotted", "Dotted").setValue(this.plugin.settings.outlineStyle).onChange(async (value) => {
-        this.plugin.settings.outlineStyle = value;
-        await this.plugin.saveSettings();
-        this.plugin.applyCSSVariables();
-      });
-    });
-    containerEl.createEl("h3", {
-      text: "Tokens"
-    });
-    const code = containerEl.createEl("pre");
-    code.createEl("code", {
-      text: "> [!note|50|orange|center|shadow|rounded|outline]"
-    });
-    const list = containerEl.createEl("ul");
+    const wrapper = containerEl.createDiv(
+      {
+        cls: "cm-support-links"
+      }
+    );
+    wrapper.style.cssText = `
+            display:flex;
+            flex-wrap:wrap;
+            gap:8px;
+            margin:0 0 20px 0;
+            `;
+    SUPPORT_LINKS.forEach(
+      (link) => {
+        const button = wrapper.createEl(
+          "a",
+          {
+            text: link.text,
+            href: link.href
+          }
+        );
+        button.className = `cm-support-button ${link.cls}`;
+        button.target = "_blank";
+        button.rel = "noopener noreferrer";
+        button.style.cssText = `
+                    padding:6px 12px;
+                    border-radius:6px;
+                    text-decoration:none;
+                    border:1px solid var(--background-modifier-border);
+                    background:var(--background-secondary);
+                    cursor:pointer;
+                    `;
+      }
+    );
+  }
+  addAppearanceSettings(containerEl) {
+    new import_obsidian.Setting(containerEl).setName(
+      "Border Radius"
+    ).setDesc(
+      "Corner radius for rounded callouts"
+    ).addSlider(
+      (slider) => {
+        slider.setLimits(
+          0,
+          32,
+          1
+        ).setValue(
+          this.plugin.settings.roundedRadius
+        ).setDynamicTooltip().onChange(
+          async (value) => {
+            this.plugin.settings.roundedRadius = value;
+            await this.plugin.saveSettings();
+            this.plugin.applyCSSVariables();
+          }
+        );
+      }
+    );
+    new import_obsidian.Setting(containerEl).setName(
+      "Shadow Strength"
+    ).setDesc(
+      "CSS shadow offset and blur values"
+    ).addText(
+      (text) => {
+        text.setValue(
+          this.plugin.settings.shadowStrength
+        ).onChange(
+          async (value) => {
+            this.plugin.settings.shadowStrength = value;
+            await this.plugin.saveSettings();
+            this.plugin.applyCSSVariables();
+          }
+        );
+      }
+    );
+    new import_obsidian.Setting(containerEl).setName(
+      "Shadow Color (Light)"
+    ).addColorPicker(
+      (picker) => {
+        picker.setValue(
+          this.plugin.settings.shadowColorLight
+        ).onChange(
+          async (value) => {
+            this.plugin.settings.shadowColorLight = value;
+            await this.plugin.saveSettings();
+            this.plugin.applyCSSVariables();
+          }
+        );
+      }
+    );
+    new import_obsidian.Setting(containerEl).setName(
+      "Shadow Color (Dark)"
+    ).addColorPicker(
+      (picker) => {
+        picker.setValue(
+          this.plugin.settings.shadowColorDark
+        ).onChange(
+          async (value) => {
+            this.plugin.settings.shadowColorDark = value;
+            await this.plugin.saveSettings();
+            this.plugin.applyCSSVariables();
+          }
+        );
+      }
+    );
+    new import_obsidian.Setting(containerEl).setName(
+      "Outline Width"
+    ).addSlider(
+      (slider) => {
+        slider.setLimits(
+          1,
+          6,
+          1
+        ).setValue(
+          this.plugin.settings.outlineWidth
+        ).setDynamicTooltip().onChange(
+          async (value) => {
+            this.plugin.settings.outlineWidth = value;
+            await this.plugin.saveSettings();
+            this.plugin.applyCSSVariables();
+          }
+        );
+      }
+    );
+    new import_obsidian.Setting(containerEl).setName(
+      "Outline Style"
+    ).addDropdown(
+      (dropdown) => {
+        dropdown.addOption(
+          "solid",
+          "Solid"
+        ).addOption(
+          "dashed",
+          "Dashed"
+        ).addOption(
+          "dotted",
+          "Dotted"
+        ).setValue(
+          this.plugin.settings.outlineStyle
+        ).onChange(
+          async (value) => {
+            this.plugin.settings.outlineStyle = value;
+            await this.plugin.saveSettings();
+            this.plugin.applyCSSVariables();
+          }
+        );
+      }
+    );
+  }
+  addEffectSettings(containerEl) {
+    const settings = [
+      [
+        "enableGlass",
+        "Glass effect",
+        "Enable translucent glass callouts"
+      ],
+      [
+        "enableGradient",
+        "Gradient effect",
+        "Enable gradient backgrounds"
+      ],
+      [
+        "enableCompact",
+        "Compact callouts",
+        "Reduce callout padding"
+      ],
+      [
+        "enableHover",
+        "Hover effect",
+        "Add hover animation"
+      ],
+      [
+        "enableSticky",
+        "Sticky callouts",
+        "Enable sticky positioning"
+      ]
+    ];
+    settings.forEach(
+      ([key, name, desc]) => {
+        new import_obsidian.Setting(containerEl).setName(name).setDesc(desc).addToggle(
+          (toggle) => {
+            toggle.setValue(
+              this.plugin.settings[key]
+            ).onChange(
+              async (value) => {
+                this.plugin.settings[key] = value;
+                await this.plugin.saveSettings();
+                this.plugin.applyCSSVariables();
+              }
+            );
+          }
+        );
+      }
+    );
+  }
+  addTokenHelp(containerEl) {
+    containerEl.createEl(
+      "pre",
+      {
+        text: "> [!note|50|orange|center|shadow|rounded|outline]"
+      }
+    );
+    const list = containerEl.createEl(
+      "ul"
+    );
     [
       "Number (0-100) \u2192 width percentage",
       "left / center / right \u2192 alignment",
-      "shadow \u2192 adds drop shadow",
+      "shadow \u2192 drop shadow",
       "rounded \u2192 rounded corners",
-      "outline \u2192 outline border",
-      "css=classname \u2192 custom CSS class",
-      "Anything else \u2192 callout color"
-    ].forEach((item) => {
-      list.createEl("li", {
-        text: item
-      });
-    });
-    containerEl.createEl("h3", {
-      text: "About"
-    });
-    containerEl.createEl("p", {
-      text: `${PLUGIN_INFO.name} v${PLUGIN_INFO.version} by ${PLUGIN_INFO.author}`
-    });
-  }
-  addSupportLinks(containerEl) {
-    containerEl.createEl("h3", {
-      text: "Support & Links"
-    });
-    const wrapper = containerEl.createDiv();
-    wrapper.addClass(
-      "callout-metadata-support"
+      "outline \u2192 border outline",
+      "glass \u2192 glass effect",
+      "gradient \u2192 gradient effect",
+      "compact \u2192 smaller padding",
+      "hover \u2192 hover animation",
+      "sticky \u2192 sticky positioning",
+      "css=name \u2192 custom CSS class",
+      "Anything else \u2192 color"
+    ].forEach(
+      (item) => {
+        list.createEl(
+          "li",
+          {
+            text: item
+          }
+        );
+      }
     );
-    SUPPORT_LINKS.forEach((link) => {
-      const a = wrapper.createEl("a", {
-        text: link.text,
-        href: link.href
-      });
-      a.className = link.cls;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-    });
   }
 };
 
@@ -329,14 +531,22 @@ var DEFAULT_SETTINGS = {
   outlineWidth: 2,
   outlineColorLight: "#888888",
   outlineColorDark: "#aaaaaa",
-  outlineStyle: "solid"
+  outlineStyle: "solid",
+  enableGlass: true,
+  enableGradient: true,
+  enableCompact: true,
+  enableHover: true,
+  enableSticky: true,
+  showSupportLinks: true
 };
 
 // src/main.ts
 var CalloutMetadataPlugin = class extends import_obsidian2.Plugin {
   constructor() {
     super(...arguments);
-    this.settings = DEFAULT_SETTINGS;
+    this.settings = {
+      ...DEFAULT_SETTINGS
+    };
     this.debouncedProcess = (0, import_obsidian2.debounce)(
       () => this.processAllViews(),
       200,
@@ -346,14 +556,22 @@ var CalloutMetadataPlugin = class extends import_obsidian2.Plugin {
   async onload() {
     await this.loadSettings();
     this.applyCSSVariables();
-    this.registerMarkdownPostProcessor((el) => {
-      processCallouts(el);
-    });
-    this.app.workspace.onLayoutReady(() => {
-      this.processAllViews();
-      this.applyCSSVariables();
-      this.app.workspace.trigger("css-change");
-    });
+    this.applyEffectClasses();
+    this.registerMarkdownPostProcessor(
+      (el) => {
+        processCallouts(el);
+      }
+    );
+    this.app.workspace.onLayoutReady(
+      () => {
+        this.processAllViews();
+        this.applyCSSVariables();
+        this.applyEffectClasses();
+        this.app.workspace.trigger(
+          "css-change"
+        );
+      }
+    );
     this.registerEvent(
       this.app.workspace.on(
         "layout-change",
@@ -367,6 +585,7 @@ var CalloutMetadataPlugin = class extends import_obsidian2.Plugin {
         "css-change",
         () => {
           this.applyCSSVariables();
+          this.applyEffectClasses();
         }
       )
     );
@@ -377,8 +596,8 @@ var CalloutMetadataPlugin = class extends import_obsidian2.Plugin {
       )
     );
   }
-  /*
-   * Inject plugin settings into CSS variables
+  /**
+   * Apply CSS variables from settings
    */
   applyCSSVariables() {
     const root = document.documentElement;
@@ -414,6 +633,28 @@ var CalloutMetadataPlugin = class extends import_obsidian2.Plugin {
       `cm-outline-${this.settings.outlineStyle}`
     );
   }
+  /**
+   * Enable/disable optional effects
+   * through body classes.
+   */
+  applyEffectClasses() {
+    const body = document.body;
+    const effects = {
+      glass: this.settings.enableGlass,
+      gradient: this.settings.enableGradient,
+      compact: this.settings.enableCompact,
+      hover: this.settings.enableHover,
+      sticky: this.settings.enableSticky
+    };
+    Object.entries(effects).forEach(
+      ([name, enabled]) => {
+        body.toggleClass(
+          `cm-${name}-disabled`,
+          !enabled
+        );
+      }
+    );
+  }
   processAllViews() {
     this.app.workspace.iterateAllLeaves(
       (leaf) => {
@@ -435,6 +676,11 @@ var CalloutMetadataPlugin = class extends import_obsidian2.Plugin {
   async saveSettings() {
     await this.saveData(
       this.settings
+    );
+    this.applyCSSVariables();
+    this.applyEffectClasses();
+    this.app.workspace.trigger(
+      "css-change"
     );
   }
 };

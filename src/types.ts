@@ -1,71 +1,112 @@
+export type CalloutAlign = "left" | "center" | "right";
+
+
 export interface CalloutMetadata {
+    /**
+     * Width percentage.
+     *
+     * Example:
+     * > [!note|50]
+     */
     width?: number;
+
+
+    /**
+     * Callout color.
+     *
+     * Example:
+     * > [!note|red]
+     */
     color?: string;
-    align?: "left" | "center" | "right";
-    rounded?: boolean;
+
+    /**
+     * Alignment.
+     *
+     * Example:
+     * > [!note|center]
+     */
+    align?: CalloutAlign;
+
+
+    /*
+     * Style tokens
+     *
+     * Example:
+     *
+     * > [!note|shadow|rounded|glass]
+     */
     shadow?: boolean;
+    rounded?: boolean;
     outline?: boolean;
+    glass?: boolean;
+    gradient?: boolean;
+    borderless?: boolean;
+    compact?: boolean;
+    hover?: boolean;
+    sticky?: boolean;
+
+    /**
+     * Custom CSS classes.
+     *
+     * Example:
+     *
+     * > [!note|css=my-class]
+     */
     css?: string;
 }
 
 export interface CalloutMetadataSettings {
+    /*
+     * Rounded
+     */
     roundedRadius: number;
 
+    /*
+     * Shadow
+     */
     shadowStrength: string;
     shadowColorLight: string;
     shadowColorDark: string;
 
+    /*
+     * Outline
+     */
     outlineWidth: number;
     outlineColorLight: string;
     outlineColorDark: string;
+    outlineStyle: | "solid" | "dashed" | "dotted";
 
-    outlineStyle: "solid" | "dashed" | "dotted";
+    /*
+     * Effects
+     */
+    enableGlass: boolean;
+    enableGradient: boolean;
+    enableCompact: boolean;
+    enableHover: boolean;
+    enableSticky: boolean;
+
+    /*
+     * Support links
+     */
+    showSupportLinks: boolean;
+
 }
 
 
 export const DEFAULT_SETTINGS: CalloutMetadataSettings = {
     roundedRadius: 12,
-
     shadowStrength: "0 2px 8px",
     shadowColorLight: "#00000026",
     shadowColorDark: "#00000040",
-
     outlineWidth: 2,
     outlineColorLight: "#888888",
     outlineColorDark: "#aaaaaa",
-
     outlineStyle: "solid",
-};
 
-export const SUPPORT_LINKS = [
-    {
-        text: "☕ Buy Me a Coffee",
-        href: "https://buymeacoffee.com/erinskidds",
-        cls: "coffee-link",
-    },
-
-    {
-        text: "⭐ Star on GitHub",
-        href: "https://github.com/DudeThatsErin/CalloutMetadata",
-        cls: "github-link",
-    },
-
-    {
-        text: "🐛 Report Issues",
-        href: "https://github.com/DudeThatsErin/CalloutMetadata/issues",
-        cls: "issues-link",
-    },
-
-    {
-        text: "💬 Discord Support",
-        href: "https://discord.gg/XcJWhE3SEA",
-        cls: "discord-link",
-    },
-];
-
-
-export const PLUGIN_INFO = {
-    name: "Callout Metadata",
-    version: "1.0.0",
-    author: "Erin Skidds",
+    enableGlass: true,
+    enableGradient: true,
+    enableCompact: true,
+    enableHover: true,
+    enableSticky: true,
+    showSupportLinks: true,
 };
