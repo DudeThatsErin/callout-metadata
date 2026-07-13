@@ -2,28 +2,76 @@ import { parseMetadata } from "./parser";
 import { resolveColor } from "./utils";
 import { CalloutMetadata } from "./types";
 
+
 const PROCESSED = "data-cm-processed";
 
-export function processCallouts(container: HTMLElement): void {
+
+type StyleFlag =
+    | "shadow"
+    | "rounded"
+    | "outline"
+    | "glass"
+    | "gradient"
+    | "borderless"
+    | "compact"
+    | "hover"
+    | "sticky";
+
+
+const STYLE_FLAGS: StyleFlag[] = [
+    "shadow",
+    "rounded",
+    "outline",
+    "glass",
+    "gradient",
+    "borderless",
+    "compact",
+    "hover",
+    "sticky",
+];
+
+
+
+export function processCallouts(
+    container: HTMLElement
+): void {
+
     const callouts =
         container.querySelectorAll<HTMLElement>(
             `.callout[data-callout-metadata]:not([${PROCESSED}])`
         );
 
+
     callouts.forEach((el) => {
-        el.setAttribute(PROCESSED, "");
+
+        el.setAttribute(
+            PROCESSED,
+            ""
+        );
+
 
         const raw =
-            el.getAttribute("data-callout-metadata");
+            el.getAttribute(
+                "data-callout-metadata"
+            );
 
-        if (!raw) return;
+
+        if (!raw) {
+            return;
+        }
+
 
         applyMetadata(
             el,
             parseMetadata(raw)
         );
+
     });
+
 }
+
+
+
 
 
 function applyMetadata(
@@ -31,14 +79,19 @@ function applyMetadata(
     meta: CalloutMetadata
 ): void {
 
+
     const wrapper =
         el.closest(
             ".cm-embed-block"
-        ) as HTMLElement | null;
+        );
+
 
 
     /*
      * Width
+     *
+     * Example:
+     * > [!note|50]
      */
     if (meta.width != null) {
 
@@ -46,18 +99,18 @@ function applyMetadata(
             String(meta.width);
 
 
-        if (wrapper) {
+        el.style.setProperty(
+            "--cm-callout-width",
+            `${meta.width}%`
+        );
 
-            wrapper.style.width =
-                `${meta.width}%`;
 
-            el.style.width =
-                "100%";
+        if (wrapper instanceof HTMLElement) {
 
-        } else {
-
-            el.style.width =
-                `${meta.width}%`;
+            wrapper.style.setProperty(
+                "--cm-callout-width",
+                `${meta.width}%`
+            );
 
         }
 
@@ -65,13 +118,19 @@ function applyMetadata(
 
 
 
+
     /*
      * Color
+     *
+     * Example:
+     * > [!note|orange]
      */
     if (meta.color) {
 
         const rgb =
-            resolveColor(meta.color);
+            resolveColor(
+                meta.color
+            );
 
 
         if (rgb) {
@@ -91,6 +150,8 @@ function applyMetadata(
 
 
 
+
+
     /*
      * Alignment
      */
@@ -100,7 +161,7 @@ function applyMetadata(
             meta.align;
 
 
-        if (wrapper) {
+        if (wrapper instanceof HTMLElement) {
 
             wrapper.dataset.align =
                 meta.align;
@@ -111,95 +172,51 @@ function applyMetadata(
 
 
 
+
+
     /*
      * Boolean style tokens
+     *
+     * Example:
+     * > [!note|shadow|rounded]
      */
-    if (meta.shadow) {
+    STYLE_FLAGS.forEach(
+        flag => {
 
-        el.dataset.shadow =
-            "";
+            if (meta[flag]) {
 
-    }
+                el.dataset[flag] =
+                    "";
 
+            }
 
-    if (meta.rounded) {
-
-        el.dataset.rounded =
-            "";
-
-    }
+        }
+    );
 
 
-    if (meta.outline) {
-
-        el.dataset.outline =
-            "";
-
-    }
-
-
-    if (meta.glass) {
-
-        el.dataset.glass =
-            "";
-
-    }
-
-
-    if (meta.gradient) {
-
-        el.dataset.gradient =
-            "";
-
-    }
-
-
-    if (meta.borderless) {
-
-        el.dataset.borderless =
-            "";
-
-    }
-
-
-    if (meta.compact) {
-
-        el.dataset.compact =
-            "";
-
-    }
-
-
-    if (meta.hover) {
-
-        el.dataset.hover =
-            "";
-
-    }
-
-
-    if (meta.sticky) {
-
-        el.dataset.sticky =
-            "";
-
-    }
 
 
 
     /*
      * Custom CSS classes
+     *
+     * Example:
+     * > [!note|css=my-class]
      */
     if (meta.css) {
 
         meta.css
             .split(/\s+/)
             .filter(Boolean)
-            .forEach((cls) => {
+            .forEach(
+                cls => {
 
-                el.classList.add(cls);
+                    el.classList.add(
+                        cls
+                    );
 
-            });
+                }
+            );
 
 
         el.dataset.css =

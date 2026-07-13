@@ -1,20 +1,19 @@
 import { CalloutMetadata } from "./types";
 
 
-const STYLE_TOKENS: Array<
-    keyof Pick<
-        CalloutMetadata,
-        | "shadow"
-        | "rounded"
-        | "outline"
-        | "glass"
-        | "gradient"
-        | "borderless"
-        | "compact"
-        | "hover"
-        | "sticky"
-    >
-> = [
+type StyleToken =
+    | "shadow"
+    | "rounded"
+    | "outline"
+    | "glass"
+    | "gradient"
+    | "borderless"
+    | "compact"
+    | "hover"
+    | "sticky";
+
+
+const STYLE_TOKENS: Set<StyleToken> = new Set([
     "shadow",
     "rounded",
     "outline",
@@ -24,7 +23,7 @@ const STYLE_TOKENS: Array<
     "compact",
     "hover",
     "sticky",
-];
+]);
 
 
 export function parseMetadata(
@@ -36,32 +35,38 @@ export function parseMetadata(
     const tokens =
         raw
             .split("|")
-            .map(t => t.trim())
+            .map(token => token.trim())
             .filter(Boolean);
-
 
 
     for (const token of tokens) {
 
-
+        /*
+         * Key/value tokens
+         *
+         * Example:
+         * css=my-class
+         */
         if (token.includes("=")) {
 
-            const eq =
+            const separator =
                 token.indexOf("=");
 
 
             const key =
                 token
-                    .substring(0, eq)
+                    .slice(0, separator)
                     .toLowerCase();
 
 
             const value =
-                token.substring(eq + 1);
+                token.slice(separator + 1).trim();
 
 
-
-            if (key === "css") {
+            if (
+                key === "css" &&
+                value
+            ) {
 
                 result.css =
                     result.css
@@ -72,21 +77,34 @@ export function parseMetadata(
 
 
             continue;
-
         }
 
 
 
-
+        /*
+         * Width token
+         *
+         * Example:
+         * 50
+         */
         if (/^\d+$/.test(token)) {
 
-            result.width =
+            const width =
                 Number(token);
 
+
+            result.width =
+                Math.min(
+                    100,
+                    Math.max(
+                        0,
+                        width
+                    )
+                );
+
+
             continue;
-
         }
-
 
 
 
@@ -95,10 +113,13 @@ export function parseMetadata(
 
 
 
+        /*
+         * Alignment token
+         */
         if (
             lower === "left" ||
-            lower === "right" ||
-            lower === "center"
+            lower === "center" ||
+            lower === "right"
         ) {
 
             result.align =
@@ -110,14 +131,17 @@ export function parseMetadata(
 
 
 
+        /*
+         * Boolean style tokens
+         */
         if (
-            STYLE_TOKENS.includes(
-                lower as typeof STYLE_TOKENS[number]
+            STYLE_TOKENS.has(
+                lower as StyleToken
             )
         ) {
 
             result[
-                lower as typeof STYLE_TOKENS[number]
+                lower as StyleToken
             ] = true;
 
 
@@ -128,7 +152,13 @@ export function parseMetadata(
 
 
         /*
-         * Anything else is a color
+         * Anything else is treated as a color.
+         *
+         * Supports:
+         * red
+         * #ff0000
+         * rgb(...)
+         * rgba(...)
          */
         result.color =
             token;

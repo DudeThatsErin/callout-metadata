@@ -18,13 +18,11 @@ import {
 } from "./types";
 
 
-
 export default class CalloutMetadataPlugin extends Plugin {
 
     settings: CalloutMetadataSettings = {
         ...DEFAULT_SETTINGS
     };
-
 
 
     async onload() {
@@ -35,7 +33,6 @@ export default class CalloutMetadataPlugin extends Plugin {
         this.applyEffectClasses();
 
 
-
         this.registerMarkdownPostProcessor(
             (el) => {
 
@@ -43,7 +40,6 @@ export default class CalloutMetadataPlugin extends Plugin {
 
             }
         );
-
 
 
         this.app.workspace.onLayoutReady(
@@ -62,7 +58,6 @@ export default class CalloutMetadataPlugin extends Plugin {
         );
 
 
-
         this.registerEvent(
 
             this.app.workspace.on(
@@ -75,7 +70,6 @@ export default class CalloutMetadataPlugin extends Plugin {
             )
 
         );
-
 
 
         this.registerEvent(
@@ -93,7 +87,6 @@ export default class CalloutMetadataPlugin extends Plugin {
         );
 
 
-
         this.addSettingTab(
             new CalloutMetadataSettingTab(
                 this.app,
@@ -107,22 +100,42 @@ export default class CalloutMetadataPlugin extends Plugin {
 
 
 
+    /**
+     * Get the correct document instance.
+     *
+     * Supports Obsidian popout windows.
+     */
+    private getDocument(): Document {
+
+        return this.app.workspace.containerEl.ownerDocument;
+
+    }
+
+
+
 
 
     /**
-     * Apply CSS variables from settings
+     * Apply CSS variables from settings.
      */
     applyCSSVariables() {
 
+        const doc =
+            this.getDocument();
+
+
         const root =
-            document.documentElement;
+            doc.documentElement;
+
+
+        const body =
+            doc.body;
 
 
         const dark =
-            document.body.classList.contains(
+            body.classList.contains(
                 "theme-dark"
             );
-
 
 
         root.style.setProperty(
@@ -131,12 +144,10 @@ export default class CalloutMetadataPlugin extends Plugin {
         );
 
 
-
         root.style.setProperty(
             "--cm-shadow-strength",
             this.settings.shadowStrength
         );
-
 
 
         root.style.setProperty(
@@ -147,12 +158,10 @@ export default class CalloutMetadataPlugin extends Plugin {
         );
 
 
-
         root.style.setProperty(
             "--cm-outline-width",
             `${this.settings.outlineWidth}px`
         );
-
 
 
         root.style.setProperty(
@@ -163,22 +172,18 @@ export default class CalloutMetadataPlugin extends Plugin {
         );
 
 
-
-        document.body.classList.remove(
+        body.classList.remove(
             "cm-outline-solid",
             "cm-outline-dashed",
             "cm-outline-dotted"
         );
 
 
-        document.body.classList.add(
+        body.classList.add(
             `cm-outline-${this.settings.outlineStyle}`
         );
 
     }
-
-
-
 
 
 
@@ -190,9 +195,12 @@ export default class CalloutMetadataPlugin extends Plugin {
      */
     applyEffectClasses() {
 
-        const body =
-            document.body;
+        const doc =
+            this.getDocument();
 
+
+        const body =
+            doc.body;
 
 
         const effects = {
@@ -215,24 +223,23 @@ export default class CalloutMetadataPlugin extends Plugin {
         };
 
 
+        (
+            Object.keys(effects) as Array<
+                keyof typeof effects
+            >
+        )
+        .forEach(
+            (name) => {
 
-        Object.entries(effects)
-            .forEach(
-                ([name, enabled]) => {
+                body.toggleClass(
+                    `cm-${name}-disabled`,
+                    !effects[name]
+                );
 
-                    body.toggleClass(
-                        `cm-${name}-disabled`,
-                        !enabled
-                    );
-
-                }
-            );
+            }
+        );
 
     }
-
-
-
-
 
 
 
@@ -244,9 +251,6 @@ export default class CalloutMetadataPlugin extends Plugin {
             200,
             true
         );
-
-
-
 
 
 
@@ -276,23 +280,22 @@ export default class CalloutMetadataPlugin extends Plugin {
 
 
 
-
-
-
-
     async loadSettings() {
+
+        const data =
+            await this.loadData() as Partial<
+                CalloutMetadataSettings
+            >;
+
 
         this.settings =
             Object.assign(
                 {},
                 DEFAULT_SETTINGS,
-                await this.loadData()
+                data
             );
 
     }
-
-
-
 
 
 
@@ -308,6 +311,7 @@ export default class CalloutMetadataPlugin extends Plugin {
         this.applyCSSVariables();
 
         this.applyEffectClasses();
+
 
         this.app.workspace.trigger(
             "css-change"

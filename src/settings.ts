@@ -10,11 +10,9 @@ import {
     SUPPORT_LINKS
 } from "./constants";
 
-
 export class CalloutMetadataSettingTab extends PluginSettingTab {
 
     plugin: CalloutMetadataPlugin;
-
 
     constructor(
         app: App,
@@ -27,30 +25,23 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
 
     }
 
-
     display(): void {
 
-        const { containerEl } = this;
+        const {
+            containerEl
+        } = this;
 
         containerEl.empty();
 
-
-        containerEl.createEl(
-            "h2",
-            {
-                text: "Callout Metadata"
-            }
-        );
-
+        new Setting(containerEl)
+            .setName("Callout Metadata")
+            .setHeading();
 
         this.renderSupport(containerEl);
 
         this.renderAppearance(containerEl);
 
     }
-
-
-
 
     private async updateSettings(
         callback: () => void
@@ -60,14 +51,7 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
 
         await this.plugin.saveSettings();
 
-        this.plugin.applyCSSVariables();
-
     }
-
-
-
-
-
 
     private renderSupport(
         container: HTMLElement
@@ -79,333 +63,272 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
                 "Support development, report bugs, or get help."
             );
 
-
         const wrapper =
-            container.createDiv(
-                {
-                    cls: "support-container"
-                }
+            container.createDiv({
+                cls: "support-container"
+            });
+
+        SUPPORT_LINKS.forEach((link) => {
+
+            const anchor =
+                wrapper.createEl(
+                    "a",
+                    {
+                        text: link.text,
+                        href: link.href
+                    }
+                );
+
+            anchor.classList.add(
+                "support-link",
+                link.cls
             );
 
+            anchor.target =
+                "_blank";
 
-        SUPPORT_LINKS.forEach(
-            link => {
+            anchor.rel =
+                "noopener noreferrer";
 
-                const anchor =
-                    wrapper.createEl(
-                        "a",
-                        {
-                            text: link.text,
-                            href: link.href
+        });
+
+    }
+
+private renderAppearance(
+    container: HTMLElement
+) {
+
+    new Setting(container)
+        .setName("Appearance")
+        .setHeading();
+
+    new Setting(container)
+        .setDesc(
+            "These settings customize callouts that use the matching metadata tokens. They do not change every callout in your vault. For example, Border Radius only affects callouts using |rounded, shadows only affect callouts using |shadow, and outlines only affect callouts using |outline."
+        );
+
+
+    new Setting(container)
+
+        .setName("Border Radius")
+
+        .setDesc(
+            "Sets the corner radius for callouts using the 'rounded' token (example: [!note|rounded])."
+        )
+
+        .addSlider((slider) => {
+
+            slider
+
+                .setLimits(
+                    0,
+                    32,
+                    1
+                )
+
+                .setValue(
+                    this.plugin.settings.roundedRadius
+                )
+
+                .onChange(async (value) => {
+
+                    await this.updateSettings(
+                        () => {
+
+                            this.plugin.settings.roundedRadius =
+                                value;
+
                         }
                     );
 
+                });
 
-                anchor.classList.add(
-                    "support-link",
-                    link.cls
-                );
+        });
 
 
-                anchor.target =
-                    "_blank";
+    new Setting(container)
 
+        .setName("Shadow Strength")
 
-                anchor.rel =
-                    "noopener noreferrer";
+        .setDesc(
+            "Sets the box-shadow values for callouts using the 'shadow' token (example: [!note|shadow])."
+        )
 
-            }
-        );
+        .addText((text) => {
 
-    }
+            text
 
+                .setValue(
+                    this.plugin.settings.shadowStrength
+                )
 
+                .onChange(async (value) => {
 
+                    await this.updateSettings(
+                        () => {
 
+                            this.plugin.settings.shadowStrength =
+                                value;
 
+                        }
+                    );
 
+                });
 
+        });
 
-    private renderAppearance(
-        container: HTMLElement
-    ) {
 
-        container.createEl(
-            "h3",
-            {
-                text: "Appearance"
-            }
-        );
+    new Setting(container)
 
+        .setName("Shadow Color (Light)")
 
+        .setDesc(
+            "Sets the shadow color for 'shadow' callouts while using the light theme."
+        )
 
-        new Setting(container)
+        .addColorPicker((picker) => {
 
-            .setName("Border Radius")
+            picker
 
-            .setDesc(
-                "Corner radius for rounded callouts"
-            )
+                .setValue(
+                    this.plugin.settings.shadowColorLight
+                )
 
-            .addSlider(
-                slider => {
+                .onChange(async (value) => {
 
-                    slider
+                    await this.updateSettings(
+                        () => {
 
-                        .setLimits(
-                            0,
-                            32,
-                            1
-                        )
+                            this.plugin.settings.shadowColorLight =
+                                value;
 
-                        .setValue(
-                            this.plugin.settings.roundedRadius
-                        )
+                        }
+                    );
 
-                        .setDynamicTooltip()
+                });
 
-                        .onChange(
-                            async value => {
+        });
 
-                                await this.updateSettings(
-                                    () => {
-                                        this.plugin.settings.roundedRadius =
-                                            value;
-                                    }
-                                );
 
-                            }
-                        );
+    new Setting(container)
 
-                }
-            );
+        .setName("Shadow Color (Dark)")
 
+        .setDesc(
+            "Sets the shadow color for 'shadow' callouts while using the dark theme."
+        )
 
+        .addColorPicker((picker) => {
 
+            picker
 
+                .setValue(
+                    this.plugin.settings.shadowColorDark
+                )
 
+                .onChange(async (value) => {
 
+                    await this.updateSettings(
+                        () => {
 
+                            this.plugin.settings.shadowColorDark =
+                                value;
 
-        new Setting(container)
+                        }
+                    );
 
-            .setName("Shadow Strength")
+                });
 
-            .setDesc(
-                "CSS shadow offset and blur values"
-            )
+        });
 
-            .addText(
-                text => {
 
-                    text
+    new Setting(container)
 
-                        .setValue(
-                            this.plugin.settings.shadowStrength
-                        )
+        .setName("Outline Width")
 
-                        .onChange(
-                            async value => {
+        .setDesc(
+            "Sets the border thickness for callouts using the 'outline' token (example: [!warning|outline])."
+        )
 
-                                await this.updateSettings(
-                                    () => {
-                                        this.plugin.settings.shadowStrength =
-                                            value;
-                                    }
-                                );
+        .addSlider((slider) => {
 
-                            }
-                        );
+            slider
 
-                }
-            );
+                .setLimits(
+                    1,
+                    6,
+                    1
+                )
 
+                .setValue(
+                    this.plugin.settings.outlineWidth
+                )
 
+                .onChange(async (value) => {
 
+                    await this.updateSettings(
+                        () => {
 
+                            this.plugin.settings.outlineWidth =
+                                value;
 
+                        }
+                    );
 
+                });
 
+        });
 
-        new Setting(container)
 
-            .setName("Shadow Color (Light)")
+    new Setting(container)
 
-            .setDesc(
-                "Shadow color in light mode"
-            )
+        .setName("Outline Style")
 
-            .addColorPicker(
-                picker => {
+        .setDesc(
+            "Sets the border style for callouts using the 'outline' token."
+        )
 
-                    picker
+        .addDropdown((dropdown) => {
 
-                        .setValue(
-                            this.plugin.settings.shadowColorLight
-                        )
+            dropdown
 
-                        .onChange(
-                            async value => {
+                .addOption(
+                    "solid",
+                    "Solid"
+                )
 
-                                await this.updateSettings(
-                                    () => {
-                                        this.plugin.settings.shadowColorLight =
-                                            value;
-                                    }
-                                );
+                .addOption(
+                    "dashed",
+                    "Dashed"
+                )
 
-                            }
-                        );
+                .addOption(
+                    "dotted",
+                    "Dotted"
+                )
 
-                }
-            );
+                .setValue(
+                    this.plugin.settings.outlineStyle
+                )
 
+                .onChange(async (value) => {
 
+                    await this.updateSettings(
+                        () => {
 
+                            this.plugin.settings.outlineStyle =
+                                value as
+                                "solid" |
+                                "dashed" |
+                                "dotted";
 
+                        }
+                    );
 
+                });
 
+        });
 
-
-        new Setting(container)
-
-            .setName("Shadow Color (Dark)")
-
-            .setDesc(
-                "Shadow color in dark mode"
-            )
-
-            .addColorPicker(
-                picker => {
-
-                    picker
-
-                        .setValue(
-                            this.plugin.settings.shadowColorDark
-                        )
-
-                        .onChange(
-                            async value => {
-
-                                await this.updateSettings(
-                                    () => {
-                                        this.plugin.settings.shadowColorDark =
-                                            value;
-                                    }
-                                );
-
-                            }
-                        );
-
-                }
-            );
-
-
-
-
-
-
-
-
-        new Setting(container)
-
-            .setName("Outline Width")
-
-            .setDesc(
-                "Border width for outline callouts"
-            )
-
-            .addSlider(
-                slider => {
-
-                    slider
-
-                        .setLimits(
-                            1,
-                            6,
-                            1
-                        )
-
-                        .setValue(
-                            this.plugin.settings.outlineWidth
-                        )
-
-                        .setDynamicTooltip()
-
-                        .onChange(
-                            async value => {
-
-                                await this.updateSettings(
-                                    () => {
-                                        this.plugin.settings.outlineWidth =
-                                            value;
-                                    }
-                                );
-
-                            }
-                        );
-
-                }
-            );
-
-
-
-
-
-
-
-
-        new Setting(container)
-
-            .setName("Outline Style")
-
-            .setDesc(
-                "Border style"
-            )
-
-            .addDropdown(
-                dropdown => {
-
-                    dropdown
-
-                        .addOption(
-                            "solid",
-                            "Solid"
-                        )
-
-                        .addOption(
-                            "dashed",
-                            "Dashed"
-                        )
-
-                        .addOption(
-                            "dotted",
-                            "Dotted"
-                        )
-
-                        .setValue(
-                            this.plugin.settings.outlineStyle
-                        )
-
-                        .onChange(
-                            async value => {
-
-                                await this.updateSettings(
-                                    () => {
-                                        this.plugin.settings.outlineStyle =
-                                            value as
-                                            "solid" |
-                                            "dashed" |
-                                            "dotted";
-                                    }
-                                );
-
-                            }
-                        );
-
-                }
-            );
-
-    }
+}
 
 }
