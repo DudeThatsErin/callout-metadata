@@ -74,6 +74,8 @@ export function processCallouts(
 
 
 
+
+
 function applyMetadata(
     el: HTMLElement,
     meta: CalloutMetadata
@@ -81,7 +83,7 @@ function applyMetadata(
 
 
     const wrapper =
-        el.closest(
+        el.closest<HTMLElement>(
             ".cm-embed-block"
         );
 
@@ -105,7 +107,7 @@ function applyMetadata(
         );
 
 
-        if (wrapper instanceof HTMLElement) {
+        if (wrapper) {
 
             wrapper.style.setProperty(
                 "--cm-callout-width",
@@ -115,6 +117,7 @@ function applyMetadata(
         }
 
     }
+
 
 
 
@@ -152,6 +155,8 @@ function applyMetadata(
 
 
 
+
+
     /*
      * Alignment
      */
@@ -161,7 +166,7 @@ function applyMetadata(
             meta.align;
 
 
-        if (wrapper instanceof HTMLElement) {
+        if (wrapper) {
 
             wrapper.dataset.align =
                 meta.align;
@@ -169,6 +174,8 @@ function applyMetadata(
         }
 
     }
+
+
 
 
 
@@ -192,6 +199,8 @@ function applyMetadata(
 
         }
     );
+
+
 
 
 

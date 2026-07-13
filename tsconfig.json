@@ -1,18 +1,29 @@
 {
     "compilerOptions": {
-        "baseUrl": ".",
         "module": "ESNext",
-        "target": "ES6",
         "moduleResolution": "node",
+
+        "target": "ES6",
+
         "strict": true,
         "skipLibCheck": true,
+
         "noImplicitAny": true,
+
         "esModuleInterop": true,
         "allowSyntheticDefaultImports": true,
+
+        "lib": [
+            "ES2020",
+            "DOM",
+            "DOM.Iterable"
+        ],
+
         "types": [
             "node"
         ]
     },
+
     "include": [
         "src/**/*.ts"
     ]

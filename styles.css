@@ -3,35 +3,40 @@ Callout Metadata
 Plugin controlled CSS
 */
 
-/* Support Links */
+
+/* =========================================================
+   Support Links
+========================================================= */
+
 .support-container {
-    display: flex;
-    gap: 8px;
-    flex-wrap: wrap;
-    padding: 8px 0 12px 0;
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    padding:8px 0 12px 0;
 }
 
 
 .support-link {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
 
-    padding: 8px 14px;
+    padding:8px 14px;
 
-    border-radius: 6px;
+    border-radius:6px;
 
-    text-decoration: none;
-    font-size: var(--font-ui-small);
-    font-weight: 500;
+    text-decoration:none;
 
-    line-height: 1;
+    font-size:var(--font-ui-small);
+    font-weight:500;
 
-    border: 1px solid transparent;
+    line-height:1;
 
-    cursor: pointer;
+    border:1px solid transparent;
 
-    white-space: nowrap;
+    cursor:pointer;
+
+    white-space:nowrap;
 
     transition:
         background-color 0.15s ease,
@@ -41,90 +46,108 @@ Plugin controlled CSS
 
 
 .support-link:hover {
-    text-decoration: none;
-    transform: translateY(-1px);
-    opacity: 0.9;
+    text-decoration:none;
+    transform:translateY(-1px);
+    opacity:0.9;
 }
 
 
-/* Buy Me a Coffee */
-.coffee-link {
-    background: #FFDD00 !important;
-    color: #000 !important;
-}
+/*
+ * Support link colors
+ *
+ * Higher specificity replaces !important
+ */
 
-.coffee-link:hover {
-    background: #e6c800 !important;
-}
-
-
-/* GitHub */
-.github-link {
-    background: #24292e !important;
-    color: #fff !important;
-}
-
-.github-link:hover {
-    background: #3a4149 !important;
+.support-link.coffee-link {
+    background:#FFDD00;
+    color:#000;
 }
 
 
-/* Issues */
-.issues-link {
-    background: #d73a49 !important;
-    color: #fff !important;
-}
-
-.issues-link:hover {
-    background: #b02a37 !important;
+.support-link.coffee-link:hover {
+    background:#e6c800;
 }
 
 
-/* Discord */
-.discord-link {
-    background: #5865F2 !important;
-    color: #fff !important;
+.support-link.github-link {
+    background:#24292e;
+    color:#fff;
 }
 
-.discord-link:hover {
-    background: #4752c4 !important;
+
+.support-link.github-link:hover {
+    background:#3a4149;
+}
+
+
+.support-link.issues-link {
+    background:#d73a49;
+    color:#fff;
+}
+
+
+.support-link.issues-link:hover {
+    background:#b02a37;
+}
+
+
+.support-link.discord-link {
+    background:#5865F2;
+    color:#fff;
+}
+
+
+.support-link.discord-link:hover {
+    background:#4752c4;
 }
 
 
 /*
  * Remove Obsidian setting row borders/padding
- * around the support link section
+ * around support links
+ *
+ * Uses dedicated class instead of :has()
  */
-.setting-item:has(.support-link) {
-    border: none;
-    padding-top: 4px;
-    padding-bottom: 8px;
+
+.setting-item.support-setting {
+    border:none;
+    padding-top:4px;
+    padding-bottom:8px;
 }
 
-/* Apply metadata colors to callouts */
+
+/* =========================================================
+   Callout Metadata Colors
+========================================================= */
+
 .callout[data-callout-metadata] {
-    --callout-color: var(--callout-color);
-}
-
-
-/* Force Obsidian callout color to use metadata color */
-.callout[data-color] {
-    --callout-color: inherit;
+    --callout-color:var(--callout-color);
 }
 
 
 .callout[data-color] {
-    border-color: rgb(var(--callout-color));
+    --callout-color:inherit;
+}
+
+
+.callout[data-color] {
+    border-color:
+        rgb(var(--callout-color));
 }
 
 
 .callout[data-color] .callout-title {
-    background-color: rgba(var(--callout-color), 0.15);
+    background-color:
+        rgba(
+            var(--callout-color),
+            0.15
+        );
 }
 
 
 .callout[data-color] .callout-icon {
-    color: rgb(var(--callout-color));
+    color:
+        rgb(var(--callout-color));
 }
 
 
@@ -152,50 +175,63 @@ Plugin controlled CSS
     margin-right:0;
 }
 
+
 /* Live preview */
+
 .cm-embed-block[data-align="left"] {
     margin-left:0;
     margin-right:auto;
 }
+
 
 .cm-embed-block[data-align="center"] {
     margin-left:auto;
     margin-right:auto;
 }
 
+
 .cm-embed-block[data-align="right"] {
     margin-left:auto;
     margin-right:0;
 }
 
+
 /* =========================================================
    Width
 ========================================================= */
+
 .callout[data-width] {
     max-width:100%;
 }
 
+
 /* =========================================================
    Shadow
 ========================================================= */
+
 .callout[data-shadow] {
     box-shadow:
         var(--cm-shadow-strength)
         var(--cm-shadow-color);
 }
 
+
 /* =========================================================
    Rounded
 ========================================================= */
+
 .callout[data-rounded] {
     border-radius:
         var(--cm-rounded-radius);
+
     overflow:hidden;
 }
+
 
 /* =========================================================
    Outline
 ========================================================= */
+
 .callout[data-outline] {
     border:
         var(--cm-outline-width)
@@ -203,10 +239,12 @@ Plugin controlled CSS
         var(--cm-outline-color);
 }
 
+
 body.cm-outline-dashed
 .callout[data-outline] {
     border-style:dashed;
 }
+
 
 body.cm-outline-dotted
 .callout[data-outline] {
@@ -217,6 +255,7 @@ body.cm-outline-dotted
 /* =========================================================
    Glass
 ========================================================= */
+
 .callout[data-glass] {
     background:
         color-mix(
@@ -225,15 +264,19 @@ body.cm-outline-dotted
             25%,
             transparent
         );
+
     backdrop-filter:
         blur(12px);
+
     -webkit-backdrop-filter:
         blur(12px);
 }
 
+
 /* =========================================================
    Gradient
 ========================================================= */
+
 .callout[data-gradient] {
     background:
         linear-gradient(
@@ -248,9 +291,11 @@ body.cm-outline-dotted
         );
 }
 
+
 /* =========================================================
    Borderless
 ========================================================= */
+
 .callout[data-borderless] {
     border:none;
 }
@@ -259,10 +304,10 @@ body.cm-outline-dotted
 /* =========================================================
    Compact
 ========================================================= */
+
 .callout[data-compact]
 .callout-content {
-    padding:
-        0.5rem;
+    padding:0.5rem;
 }
 
 
@@ -277,11 +322,13 @@ body.cm-outline-dotted
 /* =========================================================
    Hover
 ========================================================= */
+
 .callout[data-hover] {
     transition:
         transform .2s ease,
         box-shadow .2s ease;
 }
+
 
 .callout[data-hover]:hover {
     transform:
@@ -296,16 +343,18 @@ body.cm-outline-dotted
 /* =========================================================
    Sticky
 ========================================================= */
+
 .callout[data-sticky] {
     position:sticky;
     top:
         var(--header-height);
-
 }
+
 
 /* =========================================================
    Custom CSS classes
 ========================================================= */
+
 .callout[data-css] {
 
     /* marker only */

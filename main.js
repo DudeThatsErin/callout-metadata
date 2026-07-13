@@ -172,7 +172,7 @@ function applyMetadata(el, meta) {
       "--cm-callout-width",
       `${meta.width}%`
     );
-    if (wrapper instanceof HTMLElement) {
+    if (wrapper) {
       wrapper.style.setProperty(
         "--cm-callout-width",
         `${meta.width}%`
@@ -193,7 +193,7 @@ function applyMetadata(el, meta) {
   }
   if (meta.align) {
     el.dataset.align = meta.align;
-    if (wrapper instanceof HTMLElement) {
+    if (wrapper) {
       wrapper.dataset.align = meta.align;
     }
   }
@@ -545,10 +545,11 @@ var CalloutMetadataPlugin = class extends import_obsidian2.Plugin {
   }
   async loadSettings() {
     const data = await this.loadData();
+    const savedSettings = typeof data === "object" && data !== null ? data : {};
     this.settings = Object.assign(
       {},
       DEFAULT_SETTINGS,
-      data
+      savedSettings
     );
   }
   async saveSettings() {

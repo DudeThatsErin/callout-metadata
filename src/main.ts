@@ -280,22 +280,27 @@ export default class CalloutMetadataPlugin extends Plugin {
 
 
 
-    async loadSettings() {
+async loadSettings() {
 
-        const data =
-            await this.loadData() as Partial<
-                CalloutMetadataSettings
-            >;
+    const data: unknown =
+        await this.loadData();
 
 
-        this.settings =
-            Object.assign(
-                {},
-                DEFAULT_SETTINGS,
-                data
-            );
+    const savedSettings =
+        typeof data === "object" &&
+        data !== null
+            ? data as Partial<CalloutMetadataSettings>
+            : {};
 
-    }
+
+    this.settings =
+        Object.assign(
+            {},
+            DEFAULT_SETTINGS,
+            savedSettings
+        );
+
+}
 
 
 
