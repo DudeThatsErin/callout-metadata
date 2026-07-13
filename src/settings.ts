@@ -33,10 +33,6 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
 
         containerEl.empty();
 
-        new Setting(containerEl)
-            .setName("Callout Metadata")
-            .setHeading();
-
         this.renderSupport(containerEl);
 
         this.renderAppearance(containerEl);
@@ -59,6 +55,7 @@ export class CalloutMetadataSettingTab extends PluginSettingTab {
 
         new Setting(container)
             .setName("Support & Links")
+            .setHeading()
             .setDesc(
                 "Support development, report bugs, or get help."
             );

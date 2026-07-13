@@ -254,7 +254,6 @@ var CalloutMetadataSettingTab = class extends import_obsidian.PluginSettingTab {
       containerEl
     } = this;
     containerEl.empty();
-    new import_obsidian.Setting(containerEl).setName("Callout Metadata").setHeading();
     this.renderSupport(containerEl);
     this.renderAppearance(containerEl);
   }
@@ -263,7 +262,7 @@ var CalloutMetadataSettingTab = class extends import_obsidian.PluginSettingTab {
     await this.plugin.saveSettings();
   }
   renderSupport(container) {
-    new import_obsidian.Setting(container).setName("Support & Links").setDesc(
+    new import_obsidian.Setting(container).setName("Support & Links").setHeading().setDesc(
       "Support development, report bugs, or get help."
     );
     const wrapper = container.createDiv({
