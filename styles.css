@@ -86,170 +86,180 @@ Plain JavaScript plugin styles
 ========================================================= */
 
 /*
- * Do not replace Obsidian's --callout-color or --callout-icon.
- * Themes disagree on whether --callout-color is a full CSS color or raw RGB
- * channels. This plugin owns its color variable and only paints the visible
- * accent pieces, so the original callout type and icon remain intact.
+ * Keep Obsidian's native --callout-color and --callout-icon untouched.
+ * The plugin owns a separate color variable and paints only the visible
+ * accent pieces. The extra view scoping intentionally gives these rules
+ * enough specificity to beat ordinary theme rules without priority overrides.
  */
-.callout[data-color] {
-    border-color: var(--cm-custom-callout-color) !important;
+body .markdown-rendered .callout[data-color],
+body .markdown-source-view .callout[data-color] {
+    border-color: var(--cm-custom-callout-color);
+    --callout-border-color: var(--cm-custom-callout-color);
 }
 
-.callout[data-color] > .callout-title {
+body .markdown-rendered .callout[data-color] > .callout-title,
+body .markdown-source-view .callout[data-color] > .callout-title {
     background-color: color-mix(
         in srgb,
         var(--cm-custom-callout-color) 16%,
         transparent
-    ) !important;
+    );
 }
 
-.callout[data-color] > .callout-title .callout-icon {
-    color: var(--cm-custom-callout-color) !important;
-}
-
-/* Some themes draw the accent with an inset shadow instead of a border. */
-.callout[data-color] {
-    --callout-border-color: var(--cm-custom-callout-color);
+body .markdown-rendered .callout[data-color] > .callout-title .callout-icon,
+body .markdown-source-view .callout[data-color] > .callout-title .callout-icon {
+    color: var(--cm-custom-callout-color);
 }
 
 /* =========================================================
    Width
 ========================================================= */
 
-.callout[data-width] {
-    box-sizing: border-box !important;
-    width: var(--cm-callout-width) !important;
-    max-width: 100% !important;
+body .markdown-rendered .callout[data-width],
+body .markdown-source-view .callout[data-width] {
+    box-sizing: border-box;
+    width: var(--cm-callout-width);
+    max-width: 100%;
 }
 
 /* Live Preview: the CodeMirror callout wrapper owns the line width. */
-.markdown-source-view .cm-embed-block.cm-callout[data-cm-width],
-.markdown-source-view .cm-embed-block[data-cm-width] {
-    box-sizing: border-box !important;
-    width: var(--cm-callout-width) !important;
-    max-width: 100% !important;
+body .markdown-source-view .cm-embed-block.cm-callout[data-cm-width],
+body .markdown-source-view .cm-embed-block[data-cm-width] {
+    box-sizing: border-box;
+    width: var(--cm-callout-width);
+    max-width: 100%;
 }
 
-.markdown-source-view .cm-embed-block[data-cm-width] > .callout[data-width],
-.markdown-source-view .cm-embed-block[data-cm-width] .callout[data-width] {
-    width: 100% !important;
-    max-width: 100% !important;
+body .markdown-source-view .cm-embed-block[data-cm-width] > .callout[data-width],
+body .markdown-source-view .cm-embed-block[data-cm-width] .callout[data-width] {
+    width: 100%;
+    max-width: 100%;
 }
 
 /* =========================================================
    Alignment
 ========================================================= */
 
-.callout[data-align="left"] {
-    margin-inline-start: 0 !important;
-    margin-inline-end: auto !important;
-    margin-left: 0 !important;
-    margin-right: auto !important;
-    justify-self: start !important;
-    align-self: start !important;
+body .markdown-rendered .callout[data-align="left"],
+body .markdown-source-view .callout[data-align="left"] {
+    margin-inline-start: 0;
+    margin-inline-end: auto;
+    margin-left: 0;
+    margin-right: auto;
+    justify-self: start;
+    align-self: start;
 }
 
-.callout[data-align="center"] {
-    margin-inline-start: auto !important;
-    margin-inline-end: auto !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    justify-self: center !important;
-    align-self: center !important;
+body .markdown-rendered .callout[data-align="center"],
+body .markdown-source-view .callout[data-align="center"] {
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+    margin-left: auto;
+    margin-right: auto;
+    justify-self: center;
+    align-self: center;
 }
 
-.callout[data-align="right"] {
-    margin-inline-start: auto !important;
-    margin-inline-end: 0 !important;
-    margin-left: auto !important;
-    margin-right: 0 !important;
-    justify-self: end !important;
-    align-self: end !important;
+body .markdown-rendered .callout[data-align="right"],
+body .markdown-source-view .callout[data-align="right"] {
+    margin-inline-start: auto;
+    margin-inline-end: 0;
+    margin-left: auto;
+    margin-right: 0;
+    justify-self: end;
+    align-self: end;
 }
 
-.markdown-source-view .cm-embed-block[data-cm-align="left"] {
-    margin-inline-start: 0 !important;
-    margin-inline-end: auto !important;
-    margin-left: 0 !important;
-    margin-right: auto !important;
-    justify-self: start !important;
-    align-self: start !important;
+body .markdown-source-view .cm-embed-block[data-cm-align="left"] {
+    margin-inline-start: 0;
+    margin-inline-end: auto;
+    margin-left: 0;
+    margin-right: auto;
+    justify-self: start;
+    align-self: start;
 }
 
-.markdown-source-view .cm-embed-block[data-cm-align="center"] {
-    margin-inline-start: auto !important;
-    margin-inline-end: auto !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    justify-self: center !important;
-    align-self: center !important;
+body .markdown-source-view .cm-embed-block[data-cm-align="center"] {
+    margin-inline-start: auto;
+    margin-inline-end: auto;
+    margin-left: auto;
+    margin-right: auto;
+    justify-self: center;
+    align-self: center;
 }
 
-.markdown-source-view .cm-embed-block[data-cm-align="right"] {
-    margin-inline-start: auto !important;
-    margin-inline-end: 0 !important;
-    margin-left: auto !important;
-    margin-right: 0 !important;
-    justify-self: end !important;
-    align-self: end !important;
+body .markdown-source-view .cm-embed-block[data-cm-align="right"] {
+    margin-inline-start: auto;
+    margin-inline-end: 0;
+    margin-left: auto;
+    margin-right: 0;
+    justify-self: end;
+    align-self: end;
 }
 
 /* =========================================================
    Shadow
 ========================================================= */
 
-.callout[data-shadow] {
+body .markdown-rendered .callout[data-shadow],
+body .markdown-source-view .callout[data-shadow] {
     box-shadow:
         var(--cm-shadow-strength)
-        var(--cm-shadow-color) !important;
+        var(--cm-shadow-color);
 }
 
 /* =========================================================
    Rounded
 ========================================================= */
 
-.callout[data-rounded] {
-    border-radius: var(--cm-rounded-radius) !important;
-    overflow: hidden !important;
+body .markdown-rendered .callout[data-rounded],
+body .markdown-source-view .callout[data-rounded] {
+    border-radius: var(--cm-rounded-radius);
+    overflow: hidden;
 }
 
 /* =========================================================
    Outline
 ========================================================= */
 
-.callout[data-outline] {
-    border-width: var(--cm-outline-width) !important;
-    border-style: solid !important;
-    border-color: var(--cm-outline-color) !important;
+body .markdown-rendered .callout[data-outline],
+body .markdown-source-view .callout[data-outline] {
+    border-width: var(--cm-outline-width);
+    border-style: solid;
+    border-color: var(--cm-outline-color);
 }
 
-body.cm-outline-dashed .callout[data-outline] {
-    border-style: dashed !important;
+body.cm-outline-dashed .markdown-rendered .callout[data-outline],
+body.cm-outline-dashed .markdown-source-view .callout[data-outline] {
+    border-style: dashed;
 }
 
-body.cm-outline-dotted .callout[data-outline] {
-    border-style: dotted !important;
+body.cm-outline-dotted .markdown-rendered .callout[data-outline],
+body.cm-outline-dotted .markdown-source-view .callout[data-outline] {
+    border-style: dotted;
 }
 
 /* =========================================================
    Glass
 ========================================================= */
 
-body:not(.cm-glass-disabled) .callout[data-glass] {
+body:not(.cm-glass-disabled) .markdown-rendered .callout[data-glass],
+body:not(.cm-glass-disabled) .markdown-source-view .callout[data-glass] {
     background: color-mix(
         in srgb,
         var(--cm-effect-callout-color, currentColor) 18%,
         transparent
-    ) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
+    );
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
 
 /* =========================================================
    Gradient
 ========================================================= */
 
-body:not(.cm-gradient-disabled) .callout[data-gradient] {
+body:not(.cm-gradient-disabled) .markdown-rendered .callout[data-gradient],
+body:not(.cm-gradient-disabled) .markdown-source-view .callout[data-gradient] {
     background: linear-gradient(
         135deg,
         color-mix(
@@ -262,43 +272,48 @@ body:not(.cm-gradient-disabled) .callout[data-gradient] {
             var(--cm-effect-callout-color, currentColor) 5%,
             transparent
         )
-    ) !important;
+    );
 }
 
 /* =========================================================
    Borderless
 ========================================================= */
 
-.callout[data-borderless] {
-    border: none !important;
-    box-shadow: none !important;
+body .markdown-rendered .callout[data-borderless],
+body .markdown-source-view .callout[data-borderless] {
+    border: none;
+    box-shadow: none;
 }
 
 /* =========================================================
    Compact
 ========================================================= */
 
-body:not(.cm-compact-disabled) .callout[data-compact] > .callout-content {
-    padding: 0.5rem !important;
+body:not(.cm-compact-disabled) .markdown-rendered .callout[data-compact] > .callout-content,
+body:not(.cm-compact-disabled) .markdown-source-view .callout[data-compact] > .callout-content {
+    padding: 0.5rem;
 }
 
-body:not(.cm-compact-disabled) .callout[data-compact] > .callout-title {
-    padding: 0.35rem 0.5rem !important;
+body:not(.cm-compact-disabled) .markdown-rendered .callout[data-compact] > .callout-title,
+body:not(.cm-compact-disabled) .markdown-source-view .callout[data-compact] > .callout-title {
+    padding: 0.35rem 0.5rem;
 }
 
 /* =========================================================
    Hover
 ========================================================= */
 
-body:not(.cm-hover-disabled) .callout[data-hover] {
+body:not(.cm-hover-disabled) .markdown-rendered .callout[data-hover],
+body:not(.cm-hover-disabled) .markdown-source-view .callout[data-hover] {
     transition:
         transform 0.2s ease,
-        box-shadow 0.2s ease !important;
+        box-shadow 0.2s ease;
 }
 
-body:not(.cm-hover-disabled) .callout[data-hover]:hover {
-    transform: translateY(-2px) !important;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
+body:not(.cm-hover-disabled) .markdown-rendered .callout[data-hover]:hover,
+body:not(.cm-hover-disabled) .markdown-source-view .callout[data-hover]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
 
 /* =========================================================
@@ -306,26 +321,26 @@ body:not(.cm-hover-disabled) .callout[data-hover]:hover {
 ========================================================= */
 
 /* Reading view */
-body:not(.cm-sticky-disabled) .callout[data-sticky] {
-    position: sticky !important;
-    top: calc(var(--header-height, 0px) + 8px) !important;
-    z-index: 20 !important;
+body:not(.cm-sticky-disabled) .markdown-rendered .callout[data-sticky] {
+    position: sticky;
+    top: calc(var(--header-height, 0px) + 8px);
+    z-index: 20;
 }
 
 /* Live Preview: stick the CodeMirror wrapper, not just its child callout. */
 body:not(.cm-sticky-disabled)
 .markdown-source-view
 .cm-embed-block[data-cm-sticky] {
-    position: sticky !important;
-    top: calc(var(--header-height, 0px) + 8px) !important;
-    z-index: 20 !important;
+    position: sticky;
+    top: calc(var(--header-height, 0px) + 8px);
+    z-index: 20;
 }
 
 body:not(.cm-sticky-disabled)
 .markdown-source-view
 .cm-embed-block[data-cm-sticky] > .callout[data-sticky] {
-    position: relative !important;
-    top: auto !important;
+    position: relative;
+    top: auto;
 }
 
 /* =========================================================
