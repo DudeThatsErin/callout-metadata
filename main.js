@@ -153,6 +153,79 @@ function parseComputedColor(value) {
     return parseHexColor(value);
 }
 
+function rgbChannelsToCss(value) {
+    return value ? `rgb(${value})` : null;
+}
+
+function getRenderedCalloutColor(el) {
+    if (!el || !el.ownerDocument) return null;
+
+    const win = el.ownerDocument.defaultView;
+    if (!win) return null;
+
+    const candidates = [
+        el.querySelector(".callout-icon"),
+        el.querySelector(".callout-title"),
+        el,
+    ].filter(Boolean);
+
+    for (const candidate of candidates) {
+        const style = win.getComputedStyle(candidate);
+        const values = [style.color, style.borderTopColor, style.backgroundColor];
+
+        for (const value of values) {
+            const rgb = parseComputedColor(value);
+            if (rgb) return rgbChannelsToCss(rgb);
+        }
+    }
+
+    return null;
+}
+
+function applyInlineAlignment(el, align) {
+    if (!el) return;
+
+    const values = {
+        left: ["0", "auto", "start"],
+        center: ["auto", "auto", "center"],
+        right: ["auto", "0", "end"],
+    }[align];
+
+    if (!values) return;
+
+    const [start, end, self] = values;
+    el.style.setProperty("margin-left", start, "important");
+    el.style.setProperty("margin-right", end, "important");
+    el.style.setProperty("margin-inline-start", start, "important");
+    el.style.setProperty("margin-inline-end", end, "important");
+    el.style.setProperty("justify-self", self, "important");
+    el.style.setProperty("align-self", self, "important");
+}
+
+function clearInlineAlignment(el) {
+    if (!el) return;
+
+    el.style.removeProperty("margin-left");
+    el.style.removeProperty("margin-right");
+    el.style.removeProperty("margin-inline-start");
+    el.style.removeProperty("margin-inline-end");
+    el.style.removeProperty("justify-self");
+    el.style.removeProperty("align-self");
+}
+
+function normalizeShadowStrength(value) {
+    const input = String(value || "").trim();
+    if (!input) return DEFAULT_SETTINGS.shadowStrength;
+
+    // A single length is a common and intuitive value for "shadow spread".
+    // box-shadow itself requires at least X and Y offsets, so expand it.
+    if (/^-?(?:\d+|\d*\.\d+)(?:px|rem|em|pt|pc|cm|mm|in|%)?$/i.test(input)) {
+        return `0 2px ${input}`;
+    }
+
+    return input;
+}
+
 function resolveColor(input, doc) {
     if (!input || !doc) return null;
 
@@ -199,9 +272,11 @@ function resolveColor(input, doc) {
 }
 
 function getLivePreviewWrapper(el) {
-    const wrapper = el.closest(".cm-embed-block");
-    if (!wrapper) return null;
+    const wrapper =
+        el.closest(".cm-embed-block.cm-callout") ||
+        el.closest(".cm-embed-block");
 
+    if (!wrapper) return null;
     return wrapper.closest(".markdown-source-view") ? wrapper : null;
 }
 
@@ -210,7 +285,11 @@ function clearWrapperMetadata(wrapper) {
 
     wrapper.removeAttribute("data-cm-width");
     wrapper.removeAttribute("data-cm-align");
+    wrapper.removeAttribute("data-cm-sticky");
     wrapper.style.removeProperty("--cm-callout-width");
+    wrapper.style.removeProperty("width");
+    wrapper.style.removeProperty("max-width");
+    clearInlineAlignment(wrapper);
 }
 
 function clearAppliedMetadata(el) {
@@ -237,8 +316,16 @@ function clearAppliedMetadata(el) {
     }
 
     el.style.removeProperty("--cm-callout-width");
+    el.style.removeProperty("--cm-custom-callout-color");
+    el.style.removeProperty("--cm-effect-callout-color");
+
+    // Remove the legacy value written by the previous JS build. The new build
+    // deliberately leaves Obsidian's native --callout-color alone so the
+    // original callout type/icon styling remains authoritative.
     el.style.removeProperty("--callout-color");
     el.style.removeProperty("width");
+    el.style.removeProperty("max-width");
+    clearInlineAlignment(el);
 
     clearWrapperMetadata(wrapper);
 }
@@ -251,11 +338,16 @@ function applyMetadata(el, meta) {
 
         el.setAttribute("data-width", String(meta.width));
         el.style.setProperty("--cm-callout-width", width);
-        el.style.width = width;
+        el.style.setProperty("max-width", "100%", "important");
 
         if (wrapper) {
             wrapper.setAttribute("data-cm-width", String(meta.width));
             wrapper.style.setProperty("--cm-callout-width", width);
+            wrapper.style.setProperty("width", width, "important");
+            wrapper.style.setProperty("max-width", "100%", "important");
+            el.style.setProperty("width", "100%", "important");
+        } else {
+            el.style.setProperty("width", width, "important");
         }
     }
 
@@ -263,25 +355,54 @@ function applyMetadata(el, meta) {
         const rgb = resolveColor(meta.color, el.ownerDocument);
 
         if (rgb) {
-            // Obsidian's native callout CSS reads --callout-color as RGB channels.
-            // We do not touch data-callout, --callout-icon, or the icon DOM, so the
-            // original callout type and its original icon are preserved.
-            el.style.setProperty("--callout-color", rgb);
+            const cssColor = rgbChannelsToCss(rgb);
+
+            // Do not replace Obsidian's native --callout-color. Some themes still
+            // treat it as RGB channels while newer Obsidian accepts a CSS color.
+            // A plugin-owned variable avoids that compatibility trap and, crucially,
+            // never touches --callout-icon or the icon DOM.
+            el.style.setProperty(
+                "--cm-custom-callout-color",
+                cssColor,
+                "important"
+            );
+            el.style.setProperty(
+                "--cm-effect-callout-color",
+                cssColor,
+                "important"
+            );
             el.setAttribute("data-color", meta.color);
+        }
+    }
+
+    if ((meta.glass || meta.gradient) && !meta.color) {
+        const renderedColor = getRenderedCalloutColor(el);
+        if (renderedColor) {
+            el.style.setProperty(
+                "--cm-effect-callout-color",
+                renderedColor,
+                "important"
+            );
         }
     }
 
     if (meta.align) {
         el.setAttribute("data-align", meta.align);
+        applyInlineAlignment(el, meta.align);
 
         if (wrapper) {
             wrapper.setAttribute("data-cm-align", meta.align);
+            applyInlineAlignment(wrapper, meta.align);
         }
     }
 
     for (const flag of STYLE_FLAGS) {
         if (meta[flag]) {
             el.setAttribute(`data-${flag}`, "");
+
+            if (flag === "sticky" && wrapper) {
+                wrapper.setAttribute("data-cm-sticky", "");
+            }
         }
     }
 
@@ -686,7 +807,10 @@ module.exports = class CalloutMetadataPlugin extends Plugin {
         const dark = body.classList.contains("theme-dark");
 
         root.style.setProperty("--cm-rounded-radius", `${this.settings.roundedRadius}px`);
-        root.style.setProperty("--cm-shadow-strength", this.settings.shadowStrength);
+        root.style.setProperty(
+            "--cm-shadow-strength",
+            normalizeShadowStrength(this.settings.shadowStrength)
+        );
         root.style.setProperty(
             "--cm-shadow-color",
             dark ? this.settings.shadowColorDark : this.settings.shadowColorLight

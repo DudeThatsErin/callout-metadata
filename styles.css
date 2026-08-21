@@ -82,25 +82,58 @@ Plain JavaScript plugin styles
 }
 
 /* =========================================================
+   Custom colors
+========================================================= */
+
+/*
+ * Do not replace Obsidian's --callout-color or --callout-icon.
+ * Themes disagree on whether --callout-color is a full CSS color or raw RGB
+ * channels. This plugin owns its color variable and only paints the visible
+ * accent pieces, so the original callout type and icon remain intact.
+ */
+.callout[data-color] {
+    border-color: var(--cm-custom-callout-color) !important;
+}
+
+.callout[data-color] > .callout-title {
+    background-color: color-mix(
+        in srgb,
+        var(--cm-custom-callout-color) 16%,
+        transparent
+    ) !important;
+}
+
+.callout[data-color] > .callout-title .callout-icon {
+    color: var(--cm-custom-callout-color) !important;
+}
+
+/* Some themes draw the accent with an inset shadow instead of a border. */
+.callout[data-color] {
+    --callout-border-color: var(--cm-custom-callout-color);
+}
+
+/* =========================================================
    Width
 ========================================================= */
 
 .callout[data-width] {
-    box-sizing: border-box;
-    width: var(--cm-callout-width);
-    max-width: 100%;
+    box-sizing: border-box !important;
+    width: var(--cm-callout-width) !important;
+    max-width: 100% !important;
 }
 
-/* Live Preview needs the CodeMirror embed wrapper sized too. */
+/* Live Preview: the CodeMirror callout wrapper owns the line width. */
+.markdown-source-view .cm-embed-block.cm-callout[data-cm-width],
 .markdown-source-view .cm-embed-block[data-cm-width] {
-    box-sizing: border-box;
-    width: var(--cm-callout-width);
-    max-width: 100%;
+    box-sizing: border-box !important;
+    width: var(--cm-callout-width) !important;
+    max-width: 100% !important;
 }
 
+.markdown-source-view .cm-embed-block[data-cm-width] > .callout[data-width],
 .markdown-source-view .cm-embed-block[data-cm-width] .callout[data-width] {
-    width: 100%;
-    max-width: 100%;
+    width: 100% !important;
+    max-width: 100% !important;
 }
 
 /* =========================================================
@@ -108,33 +141,57 @@ Plain JavaScript plugin styles
 ========================================================= */
 
 .callout[data-align="left"] {
-    margin-left: 0;
-    margin-right: auto;
+    margin-inline-start: 0 !important;
+    margin-inline-end: auto !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    justify-self: start !important;
+    align-self: start !important;
 }
 
 .callout[data-align="center"] {
-    margin-left: auto;
-    margin-right: auto;
+    margin-inline-start: auto !important;
+    margin-inline-end: auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    justify-self: center !important;
+    align-self: center !important;
 }
 
 .callout[data-align="right"] {
-    margin-left: auto;
-    margin-right: 0;
+    margin-inline-start: auto !important;
+    margin-inline-end: 0 !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    justify-self: end !important;
+    align-self: end !important;
 }
 
 .markdown-source-view .cm-embed-block[data-cm-align="left"] {
-    margin-left: 0;
-    margin-right: auto;
+    margin-inline-start: 0 !important;
+    margin-inline-end: auto !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+    justify-self: start !important;
+    align-self: start !important;
 }
 
 .markdown-source-view .cm-embed-block[data-cm-align="center"] {
-    margin-left: auto;
-    margin-right: auto;
+    margin-inline-start: auto !important;
+    margin-inline-end: auto !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    justify-self: center !important;
+    align-self: center !important;
 }
 
 .markdown-source-view .cm-embed-block[data-cm-align="right"] {
-    margin-left: auto;
-    margin-right: 0;
+    margin-inline-start: auto !important;
+    margin-inline-end: 0 !important;
+    margin-left: auto !important;
+    margin-right: 0 !important;
+    justify-self: end !important;
+    align-self: end !important;
 }
 
 /* =========================================================
@@ -144,7 +201,7 @@ Plain JavaScript plugin styles
 .callout[data-shadow] {
     box-shadow:
         var(--cm-shadow-strength)
-        var(--cm-shadow-color);
+        var(--cm-shadow-color) !important;
 }
 
 /* =========================================================
@@ -152,8 +209,8 @@ Plain JavaScript plugin styles
 ========================================================= */
 
 .callout[data-rounded] {
-    border-radius: var(--cm-rounded-radius);
-    overflow: hidden;
+    border-radius: var(--cm-rounded-radius) !important;
+    overflow: hidden !important;
 }
 
 /* =========================================================
@@ -161,18 +218,17 @@ Plain JavaScript plugin styles
 ========================================================= */
 
 .callout[data-outline] {
-    border:
-        var(--cm-outline-width)
-        solid
-        var(--cm-outline-color);
+    border-width: var(--cm-outline-width) !important;
+    border-style: solid !important;
+    border-color: var(--cm-outline-color) !important;
 }
 
 body.cm-outline-dashed .callout[data-outline] {
-    border-style: dashed;
+    border-style: dashed !important;
 }
 
 body.cm-outline-dotted .callout[data-outline] {
-    border-style: dotted;
+    border-style: dotted !important;
 }
 
 /* =========================================================
@@ -180,9 +236,13 @@ body.cm-outline-dotted .callout[data-outline] {
 ========================================================= */
 
 body:not(.cm-glass-disabled) .callout[data-glass] {
-    background: rgba(var(--callout-color), 0.12);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+    background: color-mix(
+        in srgb,
+        var(--cm-effect-callout-color, currentColor) 18%,
+        transparent
+    ) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
 }
 
 /* =========================================================
@@ -190,12 +250,19 @@ body:not(.cm-glass-disabled) .callout[data-glass] {
 ========================================================= */
 
 body:not(.cm-gradient-disabled) .callout[data-gradient] {
-    background:
-        linear-gradient(
-            135deg,
-            rgba(var(--callout-color), 0.30),
-            rgba(var(--callout-color), 0.06)
-        );
+    background: linear-gradient(
+        135deg,
+        color-mix(
+            in srgb,
+            var(--cm-effect-callout-color, currentColor) 32%,
+            transparent
+        ),
+        color-mix(
+            in srgb,
+            var(--cm-effect-callout-color, currentColor) 5%,
+            transparent
+        )
+    ) !important;
 }
 
 /* =========================================================
@@ -203,19 +270,20 @@ body:not(.cm-gradient-disabled) .callout[data-gradient] {
 ========================================================= */
 
 .callout[data-borderless] {
-    border: none;
+    border: none !important;
+    box-shadow: none !important;
 }
 
 /* =========================================================
    Compact
 ========================================================= */
 
-body:not(.cm-compact-disabled) .callout[data-compact] .callout-content {
-    padding: 0.5rem;
+body:not(.cm-compact-disabled) .callout[data-compact] > .callout-content {
+    padding: 0.5rem !important;
 }
 
-body:not(.cm-compact-disabled) .callout[data-compact] .callout-title {
-    padding: 0.35rem 0.5rem;
+body:not(.cm-compact-disabled) .callout[data-compact] > .callout-title {
+    padding: 0.35rem 0.5rem !important;
 }
 
 /* =========================================================
@@ -225,21 +293,39 @@ body:not(.cm-compact-disabled) .callout[data-compact] .callout-title {
 body:not(.cm-hover-disabled) .callout[data-hover] {
     transition:
         transform 0.2s ease,
-        box-shadow 0.2s ease;
+        box-shadow 0.2s ease !important;
 }
 
 body:not(.cm-hover-disabled) .callout[data-hover]:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px) !important;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
 /* =========================================================
    Sticky
 ========================================================= */
 
+/* Reading view */
 body:not(.cm-sticky-disabled) .callout[data-sticky] {
-    position: sticky;
-    top: var(--header-height, 0px);
+    position: sticky !important;
+    top: calc(var(--header-height, 0px) + 8px) !important;
+    z-index: 20 !important;
+}
+
+/* Live Preview: stick the CodeMirror wrapper, not just its child callout. */
+body:not(.cm-sticky-disabled)
+.markdown-source-view
+.cm-embed-block[data-cm-sticky] {
+    position: sticky !important;
+    top: calc(var(--header-height, 0px) + 8px) !important;
+    z-index: 20 !important;
+}
+
+body:not(.cm-sticky-disabled)
+.markdown-source-view
+.cm-embed-block[data-cm-sticky] > .callout[data-sticky] {
+    position: relative !important;
+    top: auto !important;
 }
 
 /* =========================================================
