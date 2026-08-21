@@ -1,209 +1,141 @@
 /*
 Callout Metadata
-Plugin controlled CSS
+Plain JavaScript plugin styles
 */
-
 
 /* =========================================================
    Support Links
 ========================================================= */
 
 .support-container {
-    display:flex;
-    gap:8px;
-    flex-wrap:wrap;
-    padding:8px 0 12px 0;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    padding: 8px 0 12px 0;
 }
 
-
 .support-link {
-    display:inline-flex;
-    align-items:center;
-    justify-content:center;
-
-    padding:8px 14px;
-
-    border-radius:6px;
-
-    text-decoration:none;
-
-    font-size:var(--font-ui-small);
-    font-weight:500;
-
-    line-height:1;
-
-    border:1px solid transparent;
-
-    cursor:pointer;
-
-    white-space:nowrap;
-
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 14px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: var(--font-ui-small);
+    font-weight: 500;
+    line-height: 1;
+    border: 1px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
     transition:
         background-color 0.15s ease,
         transform 0.15s ease,
         opacity 0.15s ease;
 }
 
-
 .support-link:hover {
-    text-decoration:none;
-    transform:translateY(-1px);
-    opacity:0.9;
+    text-decoration: none;
+    transform: translateY(-1px);
+    opacity: 0.9;
 }
-
-
-/*
- * Support link colors
- *
- * Higher specificity replaces !important
- */
 
 .support-link.coffee-link {
-    background:#FFDD00;
-    color:#000;
+    background: #FFDD00;
+    color: #000;
 }
-
 
 .support-link.coffee-link:hover {
-    background:#e6c800;
+    background: #e6c800;
 }
-
 
 .support-link.github-link {
-    background:#24292e;
-    color:#fff;
+    background: #24292e;
+    color: #fff;
 }
-
 
 .support-link.github-link:hover {
-    background:#3a4149;
+    background: #3a4149;
 }
-
 
 .support-link.issues-link {
-    background:#d73a49;
-    color:#fff;
+    background: #d73a49;
+    color: #fff;
 }
-
 
 .support-link.issues-link:hover {
-    background:#b02a37;
+    background: #b02a37;
 }
-
 
 .support-link.discord-link {
-    background:#5865F2;
-    color:#fff;
+    background: #5865F2;
+    color: #fff;
 }
-
 
 .support-link.discord-link:hover {
-    background:#4752c4;
+    background: #4752c4;
 }
-
-
-/*
- * Remove Obsidian setting row borders/padding
- * around support links
- *
- * Uses dedicated class instead of :has()
- */
 
 .setting-item.support-setting {
-    border:none;
-    padding-top:4px;
-    padding-bottom:8px;
+    border: none;
+    padding-top: 4px;
+    padding-bottom: 8px;
 }
-
-
-/* =========================================================
-   Callout Metadata Colors
-========================================================= */
-
-.callout[data-callout-metadata] {
-    --callout-color:var(--callout-color);
-}
-
-
-.callout[data-color] {
-    --callout-color:inherit;
-}
-
-
-.callout[data-color] {
-    border-color:
-        rgb(var(--callout-color));
-}
-
-
-.callout[data-color] .callout-title {
-    background-color:
-        rgba(
-            var(--callout-color),
-            0.15
-        );
-}
-
-
-.callout[data-color] .callout-icon {
-    color:
-        rgb(var(--callout-color));
-}
-
-
-/* =========================================================
-   Alignment
-========================================================= */
-
-
-/* Reading view */
-
-.callout[data-align="left"] {
-    margin-left:0;
-    margin-right:auto;
-}
-
-
-.callout[data-align="center"] {
-    margin-left:auto;
-    margin-right:auto;
-}
-
-
-.callout[data-align="right"] {
-    margin-left:auto;
-    margin-right:0;
-}
-
-
-/* Live preview */
-
-.cm-embed-block[data-align="left"] {
-    margin-left:0;
-    margin-right:auto;
-}
-
-
-.cm-embed-block[data-align="center"] {
-    margin-left:auto;
-    margin-right:auto;
-}
-
-
-.cm-embed-block[data-align="right"] {
-    margin-left:auto;
-    margin-right:0;
-}
-
 
 /* =========================================================
    Width
 ========================================================= */
 
 .callout[data-width] {
-    max-width:100%;
+    box-sizing: border-box;
+    width: var(--cm-callout-width);
+    max-width: 100%;
 }
 
+/* Live Preview needs the CodeMirror embed wrapper sized too. */
+.markdown-source-view .cm-embed-block[data-cm-width] {
+    box-sizing: border-box;
+    width: var(--cm-callout-width);
+    max-width: 100%;
+}
+
+.markdown-source-view .cm-embed-block[data-cm-width] .callout[data-width] {
+    width: 100%;
+    max-width: 100%;
+}
+
+/* =========================================================
+   Alignment
+========================================================= */
+
+.callout[data-align="left"] {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+.callout[data-align="center"] {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.callout[data-align="right"] {
+    margin-left: auto;
+    margin-right: 0;
+}
+
+.markdown-source-view .cm-embed-block[data-cm-align="left"] {
+    margin-left: 0;
+    margin-right: auto;
+}
+
+.markdown-source-view .cm-embed-block[data-cm-align="center"] {
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.markdown-source-view .cm-embed-block[data-cm-align="right"] {
+    margin-left: auto;
+    margin-right: 0;
+}
 
 /* =========================================================
    Shadow
@@ -215,18 +147,14 @@ Plugin controlled CSS
         var(--cm-shadow-color);
 }
 
-
 /* =========================================================
    Rounded
 ========================================================= */
 
 .callout[data-rounded] {
-    border-radius:
-        var(--cm-rounded-radius);
-
-    overflow:hidden;
+    border-radius: var(--cm-rounded-radius);
+    overflow: hidden;
 }
-
 
 /* =========================================================
    Outline
@@ -239,124 +167,85 @@ Plugin controlled CSS
         var(--cm-outline-color);
 }
 
-
-body.cm-outline-dashed
-.callout[data-outline] {
-    border-style:dashed;
+body.cm-outline-dashed .callout[data-outline] {
+    border-style: dashed;
 }
 
-
-body.cm-outline-dotted
-.callout[data-outline] {
-    border-style:dotted;
+body.cm-outline-dotted .callout[data-outline] {
+    border-style: dotted;
 }
-
 
 /* =========================================================
    Glass
 ========================================================= */
 
-.callout[data-glass] {
-    background:
-        color-mix(
-            in srgb,
-            var(--callout-color)
-            25%,
-            transparent
-        );
-
-    backdrop-filter:
-        blur(12px);
-
-    -webkit-backdrop-filter:
-        blur(12px);
+body:not(.cm-glass-disabled) .callout[data-glass] {
+    background: rgba(var(--callout-color), 0.12);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
 }
-
 
 /* =========================================================
    Gradient
 ========================================================= */
 
-.callout[data-gradient] {
+body:not(.cm-gradient-disabled) .callout[data-gradient] {
     background:
         linear-gradient(
             135deg,
-            color-mix(
-                in srgb,
-                var(--callout-color)
-                35%,
-                transparent
-            ),
-            transparent
+            rgba(var(--callout-color), 0.30),
+            rgba(var(--callout-color), 0.06)
         );
 }
-
 
 /* =========================================================
    Borderless
 ========================================================= */
 
 .callout[data-borderless] {
-    border:none;
+    border: none;
 }
-
 
 /* =========================================================
    Compact
 ========================================================= */
 
-.callout[data-compact]
-.callout-content {
-    padding:0.5rem;
+body:not(.cm-compact-disabled) .callout[data-compact] .callout-content {
+    padding: 0.5rem;
 }
 
-
-.callout[data-compact]
-.callout-title {
-    padding:
-        0.35rem
-        0.5rem;
+body:not(.cm-compact-disabled) .callout[data-compact] .callout-title {
+    padding: 0.35rem 0.5rem;
 }
-
 
 /* =========================================================
    Hover
 ========================================================= */
 
-.callout[data-hover] {
+body:not(.cm-hover-disabled) .callout[data-hover] {
     transition:
-        transform .2s ease,
-        box-shadow .2s ease;
+        transform 0.2s ease,
+        box-shadow 0.2s ease;
 }
 
-
-.callout[data-hover]:hover {
-    transform:
-        translateY(-2px);
-
-    box-shadow:
-        0 8px 20px
-        rgba(0,0,0,.15);
+body:not(.cm-hover-disabled) .callout[data-hover]:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
 }
-
 
 /* =========================================================
    Sticky
 ========================================================= */
 
-.callout[data-sticky] {
-    position:sticky;
-    top:
-        var(--header-height);
+body:not(.cm-sticky-disabled) .callout[data-sticky] {
+    position: sticky;
+    top: var(--header-height, 0px);
 }
-
 
 /* =========================================================
    Custom CSS classes
 ========================================================= */
 
 .callout[data-css] {
-
     /* marker only */
-
 }
